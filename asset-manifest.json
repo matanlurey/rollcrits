@@ -1,0 +1,25 @@
+{
+  "files": {
+    "main.css": "/rollcrits/static/css/main.2170318a.chunk.css",
+    "main.js": "/rollcrits/static/js/main.bf9944ba.chunk.js",
+    "main.js.map": "/rollcrits/static/js/main.bf9944ba.chunk.js.map",
+    "runtime-main.js": "/rollcrits/static/js/runtime-main.0a4a60b3.js",
+    "runtime-main.js.map": "/rollcrits/static/js/runtime-main.0a4a60b3.js.map",
+    "static/css/2.cdf5201b.chunk.css": "/rollcrits/static/css/2.cdf5201b.chunk.css",
+    "static/js/2.cbea65fd.chunk.js": "/rollcrits/static/js/2.cbea65fd.chunk.js",
+    "static/js/2.cbea65fd.chunk.js.map": "/rollcrits/static/js/2.cbea65fd.chunk.js.map",
+    "index.html": "/rollcrits/index.html",
+    "precache-manifest.99fc3cde738db44c7ee95a320140a716.js": "/rollcrits/precache-manifest.99fc3cde738db44c7ee95a320140a716.js",
+    "service-worker.js": "/rollcrits/service-worker.js",
+    "static/css/2.cdf5201b.chunk.css.map": "/rollcrits/static/css/2.cdf5201b.chunk.css.map",
+    "static/css/main.2170318a.chunk.css.map": "/rollcrits/static/css/main.2170318a.chunk.css.map",
+    "static/js/2.cbea65fd.chunk.js.LICENSE.txt": "/rollcrits/static/js/2.cbea65fd.chunk.js.LICENSE.txt"
+  },
+  "entrypoints": [
+    "static/js/runtime-main.0a4a60b3.js",
+    "static/css/2.cdf5201b.chunk.css",
+    "static/js/2.cbea65fd.chunk.js",
+    "static/css/main.2170318a.chunk.css",
+    "static/js/main.bf9944ba.chunk.js"
+  ]
+}
