@@ -1,14 +1,26 @@
 @import '~antd/dist/antd.css';
 
-.site-layout-content {
-  background: #fff;
-  padding: 24px;
+body {
+  font-family: 'Roboto', sans-serif;
+}
+
+.site-content {
   min-height: 280px;
 }
 
+.content-module {
+  background: #fff;
+  padding: 24px;
+}
+
 .logo {
-  width: 120px;
+  width: 130px;
   height: 31px;
+  line-height: 31px;
+  text-align: center;
+  color: #fff;
+  font-weight: bold;
+  letter-spacing: 0.5px;
   background: rgba(255, 255, 255, 0.2);
   margin: 16px 24px 16px 0;
   float: left;
