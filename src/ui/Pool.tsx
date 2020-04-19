@@ -1,8 +1,9 @@
 import React from "react";
 import { Form, InputNumber } from "antd";
+import { AttackDiceConfig } from "../state/State";
 
 function DiceInput(props: {
-  label: string;
+  label: React.ReactNode;
   count: number;
   onChange: (count: number) => void;
 }) {
@@ -23,7 +24,12 @@ export default class Pool extends React.Component<PoolProps> {
   render() {
     const dice = this.props.dice;
     return (
-      <Form layout="inline">
+      <Form
+        labelCol={{
+          xs: { span: 24 },
+          sm: { span: 8 },
+        }}
+      >
         <DiceInput
           label="Red"
           count={dice.red}
@@ -43,18 +49,12 @@ export default class Pool extends React.Component<PoolProps> {
     );
   }
 
-  updateDice(newPool: Partial<DicePool>) {
+  updateDice(newPool: Partial<AttackDiceConfig>) {
     this.props.onChanged({ ...this.props.dice, ...newPool });
   }
 }
 
 export interface PoolProps {
-  readonly dice: DicePool;
-  readonly onChanged: (pool: DicePool) => void;
-}
-
-export interface DicePool {
-  readonly red: number;
-  readonly black: number;
-  readonly white: number;
+  readonly dice: AttackDiceConfig;
+  readonly onChanged: (pool: AttackDiceConfig) => void;
 }

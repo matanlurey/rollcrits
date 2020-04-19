@@ -2,8 +2,26 @@
   "name": "rollcrits",
   "version": "0.1.0",
   "homepage": "https://matanlurey.github.io/rollcrits",
+  "repository": "git@github.com:matanlurey/rollcrits.git",
   "private": true,
   "dependencies": {
+    "antd": "^4.1.4",
+    "prando": "^5.1.2",
+    "react": "^16.13.1",
+    "react-dom": "^16.13.1",
+    "react-scripts": "3.4.1",
+    "simple-statistics": "^7.0.8"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "deploy": "gh-pages -d build",
+    "build": "react-scripts build",
+    "test": "react-scripts test"
+  },
+  "eslintConfig": {
+    "extends": "react-app"
+  },
+  "devDependencies": {
     "@ant-design/icons": "^4.0.6",
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^9.5.0",
@@ -12,23 +30,11 @@
     "@types/node": "^13.13.0",
     "@types/react": "^16.9.34",
     "@types/react-dom": "^16.9.6",
-    "antd": "^4.1.4",
-    "prando": "^5.1.2",
-    "react": "^16.13.1",
-    "react-dom": "^16.13.1",
-    "react-scripts": "3.4.1",
-    "simple-statistics": "^7.0.8",
+    "@types/react-router-dom": "^5.1.4",
+    "gh-pages": "^2.2.0",
+    "node-sass": "^4.13.1",
+    "react-git-info": "^1.0.1",
     "typescript": "^3.8.3"
-  },
-  "scripts": {
-    "start": "react-scripts start",
-    "deploy": "gh-pages -d build",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
-  },
-  "eslintConfig": {
-    "extends": "react-app"
   },
   "browserslist": {
     "production": [
@@ -41,9 +47,5 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
-  },
-  "devDependencies": {
-    "gh-pages": "^2.2.0",
-    "node-sass": "^4.13.1"
   }
 }
