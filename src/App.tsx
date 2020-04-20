@@ -64,7 +64,9 @@ class App extends React.Component<{}, SimConfig> {
     return (
       <Layout style={{ height: '100vh' }}>
         <Sider breakpoint="lg" collapsedWidth="0" width="250px">
-          <div className="logo">RollCrits</div>
+          <div className="logo">
+            <strong>RollCrits</strong> #{App.shortHash}
+          </div>
           <Card
             title={
               <span>
