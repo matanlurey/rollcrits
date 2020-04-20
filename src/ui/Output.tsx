@@ -1,9 +1,10 @@
-import React from "react";
-import Prando from "prando";
-import { Table } from "antd";
-import { QuestionCircleOutlined } from "@ant-design/icons";
-import * as stats from "simple-statistics";
-import { AttackDiceConfig } from "../state/State";
+import React from 'react';
+import Prando from 'prando';
+import { Table } from 'antd';
+import { QuestionCircleOutlined } from '@ant-design/icons';
+import * as stats from 'simple-statistics';
+import { AttackDiceConfig } from '../state/State';
+import { VictoryChart, VictoryTheme, VictoryBar } from 'victory';
 
 enum AttackDiceSide {
   blank,
@@ -84,13 +85,30 @@ export default (props: { dice: AttackDiceConfig; iterations: number }) => {
     }
     data.push(hits);
   }
+  const grouped: { [key: number]: number } = {};
+  const ticks = new Set<number>();
+  for (const hits of data) {
+    grouped[hits] = (grouped[hits] || 0) + 1;
+    ticks.add(hits);
+  }
   return (
     <>
+      <VictoryChart
+        theme={VictoryTheme.material}
+        animate={{ duration: 1000 }}
+        height={200}
+      >
+        <VictoryBar
+          data={Object.entries(grouped).map((value) => {
+            return { x: value[0], y: value[1] };
+          })}
+        />
+      </VictoryChart>
       <Table
         bordered
         columns={[
-          { title: "Type", dataIndex: "type", width: 30, key: "type" },
-          { title: "Hits", dataIndex: "hits", width: 30, key: "hits" },
+          { title: 'Type', dataIndex: 'type', width: 30, key: 'type' },
+          { title: 'Hits', dataIndex: 'hits', width: 30, key: 'hits' },
           {
             title: (
               <>
@@ -98,14 +116,15 @@ export default (props: { dice: AttackDiceConfig; iterations: number }) => {
                 &nbsp;Details
               </>
             ),
-            dataIndex: "details",
-            key: "Details",
+            dataIndex: 'details',
+            key: 'Details',
           },
         ]}
+        pagination={false}
         dataSource={[
           {
-            key: "Mean",
-            type: "Mean",
+            key: 'Mean',
+            type: 'Mean',
             hits: stats.mean(data).toFixed(2),
             details: (
               <>
@@ -115,50 +134,50 @@ export default (props: { dice: AttackDiceConfig; iterations: number }) => {
             ),
           },
           {
-            key: "Mode",
-            type: "Mode",
+            key: 'Mode',
+            type: 'Mode',
             hits: stats.mode(data).toFixed(2),
             details: (
               <>
-                The{" "}
+                The{' '}
                 <a
                   href="https://en.wikipedia.org/wiki/Mode_(statistics)"
                   rel="_blank"
                   title="Learn more about the mode in statistics"
                 >
                   mode
-                </a>{" "}
+                </a>{' '}
                 is the most <em>commonly</em> seen result in the simulation.
               </>
             ),
           },
           {
-            key: "Median",
-            type: "Median",
+            key: 'Median',
+            type: 'Median',
             hits: stats.median(data).toFixed(2),
             details: (
               <>
-                The{" "}
+                The{' '}
                 <a
                   href="http://en.wikipedia.org/wiki/Median"
                   rel="_blank"
                   title="Learn more about the median in statistics"
                 >
                   median
-                </a>{" "}
+                </a>{' '}
                 is the middle number - useful when outliners skew the mean.
               </>
             ),
           },
           {
-            key: "P50",
-            type: "P50",
+            key: 'P50',
+            type: 'P50',
             hits: stats.quantile(data, 1 - 0.5).toFixed(2),
             details: <>50% of results will exceed this estimate.</>,
           },
           {
-            key: "P90",
-            type: "P90",
+            key: 'P90',
+            type: 'P90',
             hits: stats.quantile(data, 1 - 0.9).toFixed(2),
             details: <>90% of results will exceed this estimate.</>,
           },

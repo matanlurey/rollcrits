@@ -30,7 +30,7 @@ export function encodeConfig(config: SimConfig): string {
 export function decodeConfig(fragment: string): SimConfig | undefined {
   let urlState = window.location.hash;
   if (urlState) {
-    const fragment = urlState.indexOf("#");
+    const fragment = urlState.indexOf('#');
     if (fragment !== -1) {
       urlState = urlState.substring(fragment + 1);
     }

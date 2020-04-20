@@ -1,4 +1,4 @@
-declare module "react-git-info/macro" {
+declare module 'react-git-info/macro' {
   export default function GitInfo(): GitInfoResult;
 
   export interface CommitInfo {

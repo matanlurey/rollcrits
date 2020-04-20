@@ -1,11 +1,11 @@
-import React from "react";
-import GitInfo from "react-git-info/macro";
-import { Layout, Card, Slider } from "antd";
-import "./App.scss";
-import { SimConfig, encodeConfig, decodeConfig } from "./state/State";
-import { SettingOutlined, StarOutlined } from "@ant-design/icons";
-import Pool from "./ui/Pool";
-import Output from "./ui/Output";
+import React from 'react';
+import GitInfo from 'react-git-info/macro';
+import { Layout, Card, Slider } from 'antd';
+import './App.scss';
+import { SimConfig, encodeConfig, decodeConfig } from './state/State';
+import { SettingOutlined, StarOutlined } from '@ant-design/icons';
+import Pool from './ui/Pool';
+import Output from './ui/Output';
 
 const { Sider } = Layout;
 
@@ -32,14 +32,13 @@ class App extends React.Component<{}, SimConfig> {
   encodeStateIfChanged() {
     const encodedState = encodeConfig(this.state);
     if (encodedState === App.defaultEncodedState) {
-      window.location.hash = "";
+      window.location.hash = '';
     } else {
       window.location.hash = encodedState;
     }
   }
 
   private iterationsToSlider(iterations: number): number {
-    console.log(iterations.toString().length - 1);
     return iterations.toString().length - 1;
   }
 
@@ -63,7 +62,7 @@ class App extends React.Component<{}, SimConfig> {
   render() {
     this.encodeStateIfChanged();
     return (
-      <Layout style={{ height: "100vh" }}>
+      <Layout style={{ height: '100vh' }}>
         <Sider breakpoint="lg" collapsedWidth="0" width="250px">
           <div className="logo">RollCrits</div>
           <Card
@@ -79,9 +78,9 @@ class App extends React.Component<{}, SimConfig> {
               min={1}
               max={5}
               marks={{
-                1: "10",
-                3: "1000",
-                5: "100000",
+                1: '10',
+                3: '1000',
+                5: '100000',
               }}
               value={this.iterationsToSlider(this.state.iterations)}
               tipFormatter={this.slideToIterations.bind(this)}
@@ -111,7 +110,7 @@ class App extends React.Component<{}, SimConfig> {
           </Card>
         </Sider>
         <Layout>
-          <Layout.Content style={{ margin: "24px 16px 0" }}>
+          <Layout.Content style={{ margin: '24px 16px 0' }}>
             <div className="content-module">
               <Output
                 dice={this.state.attackPool}
