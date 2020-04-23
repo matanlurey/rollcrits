@@ -1,6 +1,6 @@
 self.__precacheManifest = (self.__precacheManifest || []).concat([
   {
-    "revision": "4d65e1770d0fb9280013b4f04871fb7d",
+    "revision": "6729baef93ed1bec5ce80bc5f151341e",
     "url": "/rollcrits/index.html"
   },
   {
@@ -8,7 +8,7 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/rollcrits/static/css/2.cdf5201b.chunk.css"
   },
   {
-    "revision": "a81c2abf82e6d6969e24",
+    "revision": "d202a2d068c7b8effc98",
     "url": "/rollcrits/static/css/main.37fe8b02.chunk.css"
   },
   {
@@ -20,8 +20,8 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/rollcrits/static/js/2.cc541448.chunk.js.LICENSE.txt"
   },
   {
-    "revision": "a81c2abf82e6d6969e24",
-    "url": "/rollcrits/static/js/main.08683528.chunk.js"
+    "revision": "d202a2d068c7b8effc98",
+    "url": "/rollcrits/static/js/main.1094a7a5.chunk.js"
   },
   {
     "revision": "843db664293cc4f573bd",
