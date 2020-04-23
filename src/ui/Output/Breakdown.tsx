@@ -28,6 +28,7 @@ export default (props: {
 
   // Aggregate results per defending unit.
   const results: Array<{
+    key: string;
     name: string;
     cover0: string;
     cover1: string;
@@ -52,6 +53,7 @@ export default (props: {
     const cover2 = Math.max(0, total - 2) * defender.toWound;
 
     results.push({
+      key: defender.name,
       name: defender.name,
       cover0: cover0.toFixed(1),
       cover1: cover1.toFixed(1),
