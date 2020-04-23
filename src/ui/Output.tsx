@@ -3,8 +3,8 @@ import Prando from 'prando';
 import { Table } from 'antd';
 import { QuestionCircleOutlined } from '@ant-design/icons';
 import * as stats from 'simple-statistics';
-import { AttackDiceConfig } from '../state/State';
-import { VictoryChart, VictoryTheme, VictoryBar } from 'victory';
+import { AttackDiceConfig, AttackDiceModifiers } from '../state/State';
+import { VictoryChart, VictoryBar, VictoryAxis } from 'victory';
 
 enum AttackDiceSide {
   blank,
@@ -64,15 +64,24 @@ class DiceRng {
   }
 }
 
-export default (props: { dice: AttackDiceConfig; iterations: number }) => {
+export default (props: {
+  dice: AttackDiceConfig;
+  iterations: number;
+  modifiers: AttackDiceModifiers;
+}) => {
   const data: number[] = [];
   const rng = new DiceRng();
+  const surges = props.modifiers.surge !== 'none';
   for (let i = 0; i < props.iterations; i++) {
     let hits = 0;
     const incrementIfHit = (side: AttackDiceSide) => {
-      if (side !== AttackDiceSide.blank && side !== AttackDiceSide.surge) {
-        hits++;
+      if (side === AttackDiceSide.blank) {
+        return;
       }
+      if (side === AttackDiceSide.surge && !surges) {
+        return;
+      }
+      hits++;
     };
     for (let w = 0; w < props.dice.white; w++) {
       incrementIfHit(rng.white());
@@ -94,14 +103,28 @@ export default (props: { dice: AttackDiceConfig; iterations: number }) => {
   return (
     <>
       <VictoryChart
-        theme={VictoryTheme.material}
         animate={{ duration: 1000 }}
-        height={200}
+        domainPadding={{ x: 15 }}
+        height={250}
       >
         <VictoryBar
           data={Object.entries(grouped).map((value) => {
             return { x: value[0], y: value[1] };
           })}
+          labels={({ datum }) =>
+            `${((datum.y / data.length) * 100).toFixed(0)}%`
+          }
+          style={{
+            data: {
+              fill: 'tomato',
+            },
+          }}
+        />
+        <VictoryAxis
+          label="Hits"
+          style={{
+            axisLabel: { padding: 30 },
+          }}
         />
       </VictoryChart>
       <Table

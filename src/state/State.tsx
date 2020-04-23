@@ -8,6 +8,11 @@ export interface SimConfig {
   attackPool: AttackDiceConfig;
 
   /**
+   * Attacking dice pool modifiers.
+   */
+  attackModifiers: AttackDiceModifiers;
+
+  /**
    * Number of times the dice should be rolled.
    */
   iterations: number;
@@ -56,4 +61,8 @@ export interface AttackDiceConfig {
    * Number of white dice.
    */
   white: number;
+}
+
+export interface AttackDiceModifiers {
+  surge: 'none' | 'hit' | 'crit';
 }

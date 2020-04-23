@@ -3,9 +3,10 @@ import GitInfo from 'react-git-info/macro';
 import { Layout, Card, Slider } from 'antd';
 import './App.scss';
 import { SimConfig, encodeConfig, decodeConfig } from './state/State';
-import { SettingOutlined, StarOutlined } from '@ant-design/icons';
+import { SettingOutlined, StarOutlined, EditOutlined } from '@ant-design/icons';
 import Pool from './ui/Pool';
 import Output from './ui/Output';
+import Modifiers from './ui/Modifiers';
 
 const { Sider } = Layout;
 
@@ -16,6 +17,9 @@ class App extends React.Component<{}, SimConfig> {
       black: 1,
       white: 1,
     },
+    attackModifiers: {
+      surge: 'none',
+    },
     iterations: 10000,
   };
 
@@ -24,9 +28,8 @@ class App extends React.Component<{}, SimConfig> {
 
   constructor(props: {}) {
     super(props);
-    this.state =
-      decodeConfig(window.location.hash) ||
-      JSON.parse(JSON.stringify(App.defaultState));
+    const state = JSON.parse(JSON.stringify(App.defaultState));
+    this.state = { ...state, ...decodeConfig(window.location.hash) };
   }
 
   encodeStateIfChanged() {
@@ -110,6 +113,23 @@ class App extends React.Component<{}, SimConfig> {
               }}
             />
           </Card>
+          <Card
+            title={
+              <span>
+                <EditOutlined />
+                <span> Modifiers</span>
+              </span>
+            }
+          >
+            <Modifiers
+              modifiers={this.state.attackModifiers}
+              onChanged={(newModifiers) => {
+                this.setState({
+                  attackModifiers: newModifiers,
+                });
+              }}
+            />
+          </Card>
         </Sider>
         <Layout>
           <Layout.Content style={{ margin: '24px 16px 0' }}>
@@ -117,6 +137,7 @@ class App extends React.Component<{}, SimConfig> {
               <Output
                 dice={this.state.attackPool}
                 iterations={this.state.iterations}
+                modifiers={this.state.attackModifiers}
               />
             </div>
           </Layout.Content>
