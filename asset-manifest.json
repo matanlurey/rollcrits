@@ -1,25 +1,25 @@
 {
   "files": {
     "main.css": "/rollcrits/static/css/main.37fe8b02.chunk.css",
-    "main.js": "/rollcrits/static/js/main.bca6bbd4.chunk.js",
-    "main.js.map": "/rollcrits/static/js/main.bca6bbd4.chunk.js.map",
+    "main.js": "/rollcrits/static/js/main.08683528.chunk.js",
+    "main.js.map": "/rollcrits/static/js/main.08683528.chunk.js.map",
     "runtime-main.js": "/rollcrits/static/js/runtime-main.0a4a60b3.js",
     "runtime-main.js.map": "/rollcrits/static/js/runtime-main.0a4a60b3.js.map",
     "static/css/2.cdf5201b.chunk.css": "/rollcrits/static/css/2.cdf5201b.chunk.css",
-    "static/js/2.c91160ec.chunk.js": "/rollcrits/static/js/2.c91160ec.chunk.js",
-    "static/js/2.c91160ec.chunk.js.map": "/rollcrits/static/js/2.c91160ec.chunk.js.map",
+    "static/js/2.cc541448.chunk.js": "/rollcrits/static/js/2.cc541448.chunk.js",
+    "static/js/2.cc541448.chunk.js.map": "/rollcrits/static/js/2.cc541448.chunk.js.map",
     "index.html": "/rollcrits/index.html",
-    "precache-manifest.599151b6cd63035202c3153512a9690c.js": "/rollcrits/precache-manifest.599151b6cd63035202c3153512a9690c.js",
+    "precache-manifest.d1a938872259db4198583d6b80e511ad.js": "/rollcrits/precache-manifest.d1a938872259db4198583d6b80e511ad.js",
     "service-worker.js": "/rollcrits/service-worker.js",
     "static/css/2.cdf5201b.chunk.css.map": "/rollcrits/static/css/2.cdf5201b.chunk.css.map",
     "static/css/main.37fe8b02.chunk.css.map": "/rollcrits/static/css/main.37fe8b02.chunk.css.map",
-    "static/js/2.c91160ec.chunk.js.LICENSE.txt": "/rollcrits/static/js/2.c91160ec.chunk.js.LICENSE.txt"
+    "static/js/2.cc541448.chunk.js.LICENSE.txt": "/rollcrits/static/js/2.cc541448.chunk.js.LICENSE.txt"
   },
   "entrypoints": [
     "static/js/runtime-main.0a4a60b3.js",
     "static/css/2.cdf5201b.chunk.css",
-    "static/js/2.c91160ec.chunk.js",
+    "static/js/2.cc541448.chunk.js",
     "static/css/main.37fe8b02.chunk.css",
-    "static/js/main.bca6bbd4.chunk.js"
+    "static/js/main.08683528.chunk.js"
   ]
 }
