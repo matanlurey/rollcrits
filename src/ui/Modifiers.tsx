@@ -1,6 +1,6 @@
 import React from 'react';
 import { Form, Select } from 'antd';
-import { AttackDiceModifiers } from '../state/State';
+import { AttackDiceModifiers } from '../state/state';
 
 const { Option } = Select;
 

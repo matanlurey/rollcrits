@@ -2,7 +2,7 @@ import React from 'react';
 import GitInfo from 'react-git-info/macro';
 import { Layout, Card, Slider } from 'antd';
 import './App.scss';
-import { SimConfig, encodeConfig, decodeConfig } from './state/State';
+import { SimConfig, encodeConfig, decodeConfig } from './state/state';
 import { SettingOutlined, StarOutlined, EditOutlined } from '@ant-design/icons';
 import Pool from './ui/Pool';
 import Output from './ui/Output';
@@ -134,11 +134,7 @@ class App extends React.Component<{}, SimConfig> {
         <Layout>
           <Layout.Content style={{ margin: '24px 16px 0' }}>
             <div className="content-module">
-              <Output
-                dice={this.state.attackPool}
-                iterations={this.state.iterations}
-                modifiers={this.state.attackModifiers}
-              />
+              <Output simulate={this.state} />
             </div>
           </Layout.Content>
         </Layout>
