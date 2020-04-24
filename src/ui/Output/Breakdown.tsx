@@ -17,6 +17,9 @@ const defending = [
 ];
 
 export default (props: {
+  mods: {
+    impact: number;
+  };
   data: Array<{
     netHits: number;
     netCrits: number;
@@ -41,9 +44,11 @@ export default (props: {
 
     if (defender.armor) {
       if (defender.armor === true) {
-        hits = 0;
+        // As many hits as you have impact, discard rest of hits.
+        hits = Math.max(0, props.mods.impact);
       } else {
-        hits = Math.max(0, hits - defender.armor);
+        // Minimum number of hits is impact, max is hits - armor.
+        hits = Math.max(props.mods.impact, hits - defender.armor);
       }
     }
 

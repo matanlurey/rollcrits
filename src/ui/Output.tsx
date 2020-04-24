@@ -43,7 +43,12 @@ export default (props: { simulate: SimConfig }) => {
           }}
         />
       </VictoryChart>
-      <Breakdown data={data} />
+      <Breakdown
+        data={data}
+        mods={{
+          impact: props.simulate.attackModifiers.impact,
+        }}
+      />
     </>
   );
 };

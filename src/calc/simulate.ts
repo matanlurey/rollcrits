@@ -3,6 +3,7 @@ import Prando from 'prando';
 import { SimConfig } from '../state/state';
 
 export interface Results {
+  impact: number;
   netHits: number;
   netCrits: number;
 }
@@ -51,7 +52,11 @@ const diceTable = {
 
 export function simulate(configuration: SimConfig): Results[] {
   const results: Results[] = [];
-  const random = new Prando();
+
+  // TODO: Make seed configurable, perhaps stored locally only.
+  const random = new Prando(
+    configuration.useRandomSeed ? undefined : '1734176512',
+  );
 
   for (let i = 0; i < configuration.iterations; i++) {
     // Aggregate results.
@@ -86,6 +91,7 @@ export function simulate(configuration: SimConfig): Results[] {
     }
 
     results.push({
+      impact: configuration.attackModifiers.impact,
       netHits: netHits,
       netCrits: netCrits,
     });

@@ -16,6 +16,11 @@ export interface SimConfig {
    * Number of times the dice should be rolled.
    */
   iterations: number;
+
+  /**
+   * Whether to use a random seed for simulations.
+   */
+  useRandomSeed: boolean;
 }
 
 /**
@@ -64,5 +69,13 @@ export interface AttackDiceConfig {
 }
 
 export interface AttackDiceModifiers {
+  /**
+   * What the `surge` icon the dice should convert to.
+   */
   surge: 'none' | 'hit' | 'crit';
+
+  /**
+   * How much impact the dice pool has.
+   */
+  impact: number;
 }

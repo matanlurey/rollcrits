@@ -1,9 +1,15 @@
 import React from 'react';
 import GitInfo from 'react-git-info/macro';
-import { Layout, Card, Slider } from 'antd';
+import { Layout, Card, Slider, Switch, Form } from 'antd';
 import './App.scss';
 import { SimConfig, encodeConfig, decodeConfig } from './state/state';
-import { SettingOutlined, StarOutlined, EditOutlined } from '@ant-design/icons';
+import {
+  SettingOutlined,
+  StarOutlined,
+  EditOutlined,
+  CheckOutlined,
+  CloseOutlined,
+} from '@ant-design/icons';
 import Pool from './ui/Pool';
 import Output from './ui/Output';
 import Modifiers from './ui/Modifiers';
@@ -18,9 +24,11 @@ class App extends React.Component<{}, SimConfig> {
       white: 1,
     },
     attackModifiers: {
+      impact: 0,
       surge: 'none',
     },
     iterations: 10000,
+    useRandomSeed: true,
   };
 
   private static readonly defaultEncodedState = encodeConfig(App.defaultState);
@@ -78,23 +86,38 @@ class App extends React.Component<{}, SimConfig> {
               </span>
             }
           >
-            Iterations
-            <Slider
-              min={1}
-              max={5}
-              marks={{
-                1: '10',
-                3: '1000',
-                5: '100000',
-              }}
-              value={this.iterationsToSlider(this.state.iterations)}
-              tipFormatter={this.slideToIterations.bind(this)}
-              onChange={(value) =>
-                this.setState({
-                  iterations: this.slideToIterations(value as number),
-                })
-              }
-            ></Slider>
+            <Form layout="vertical">
+              <Form.Item label="Iterations">
+                <Slider
+                  min={1}
+                  max={5}
+                  marks={{
+                    1: '10',
+                    3: '1000',
+                    5: '100000',
+                  }}
+                  value={this.iterationsToSlider(this.state.iterations)}
+                  tipFormatter={this.slideToIterations.bind(this)}
+                  onChange={(value) =>
+                    this.setState({
+                      iterations: this.slideToIterations(value as number),
+                    })
+                  }
+                ></Slider>
+              </Form.Item>
+              <Form.Item label="Random Seed">
+                <Switch
+                  checkedChildren={<CheckOutlined />}
+                  unCheckedChildren={<CloseOutlined />}
+                  checked={this.state.useRandomSeed}
+                  onChange={(value) =>
+                    this.setState({
+                      useRandomSeed: !!value,
+                    })
+                  }
+                />
+              </Form.Item>
+            </Form>
           </Card>
           <Card
             title={
