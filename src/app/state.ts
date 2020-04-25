@@ -1,3 +1,7 @@
+import Prando from 'prando';
+
+export let sessionRngSeed = new Prando().nextString(10);
+
 /**
  * Simulation-wide state (or configuration).
  */
@@ -18,9 +22,9 @@ export interface SimConfig {
   iterations: number;
 
   /**
-   * Whether to use a random seed for simulations.
+   * Random seed used for simulations.
    */
-  useRandomSeed: boolean;
+  rngSeed: string;
 }
 
 /**

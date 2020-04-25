@@ -1,23 +1,22 @@
 import React from 'react';
 import GitInfo from 'react-git-info/macro';
-import { Layout, Card, Slider, Switch, Form } from 'antd';
+import { Layout, Card, Form, Button, Row, Col } from 'antd';
+import { SettingOutlined, StarOutlined, EditOutlined } from '@ant-design/icons';
+
 import './App.scss';
-import { SimConfig, encodeConfig, decodeConfig } from './state/state';
-import {
-  SettingOutlined,
-  StarOutlined,
-  EditOutlined,
-  CheckOutlined,
-  CloseOutlined,
-} from '@ant-design/icons';
-import Pool from './ui/Pool';
-import Output from './ui/Output';
-import Modifiers from './ui/Modifiers';
+
+import { SimConfig, encodeConfig, decodeConfig } from './state';
+import Pool from '../ui/Pool';
+import Output from '../ui/Output';
+import Modifiers from '../ui/Modifiers';
+import IterationSlider from '../ui/IterationSlider';
+import Prando from 'prando';
+import SeedInput from '../ui/SeedInput';
 
 const { Sider } = Layout;
 
 class App extends React.Component<{}, SimConfig> {
-  private static readonly defaultState: SimConfig = {
+  public static readonly defaultState: SimConfig = Object.freeze({
     attackPool: {
       red: 1,
       black: 1,
@@ -28,8 +27,8 @@ class App extends React.Component<{}, SimConfig> {
       surge: 'none',
     },
     iterations: 10000,
-    useRandomSeed: true,
-  };
+    rngSeed: `${new Prando().nextString(10)}`,
+  });
 
   private static readonly defaultEncodedState = encodeConfig(App.defaultState);
   private static readonly shortHash = GitInfo().commit.shortHash;
@@ -49,32 +48,16 @@ class App extends React.Component<{}, SimConfig> {
     }
   }
 
-  private iterationsToSlider(iterations: number): number {
-    return iterations.toString().length - 1;
-  }
-
-  private slideToIterations(slider: number): number {
-    switch (slider) {
-      case 1:
-        return 10;
-      case 2:
-        return 100;
-      case 3:
-        return 1000;
-      case 4:
-        return 10000;
-      case 5:
-        return 100000;
-      default:
-        return App.defaultState.iterations;
-    }
-  }
-
   render() {
     this.encodeStateIfChanged();
     return (
-      <Layout style={{ height: '100vh' }}>
-        <Sider breakpoint="lg" collapsedWidth="0" width="250px">
+      <Layout style={{ minHeight: '100vh', height: '100%' }}>
+        <Sider
+          breakpoint="lg"
+          collapsedWidth="0"
+          width="250px"
+          style={{ minHeight: '100vh', height: '100%' }}
+        >
           <div className="logo">
             <strong>RollCrits</strong> #{App.shortHash}
           </div>
@@ -88,35 +71,31 @@ class App extends React.Component<{}, SimConfig> {
           >
             <Form layout="vertical">
               <Form.Item label="Iterations">
-                <Slider
-                  min={1}
-                  max={5}
-                  marks={{
-                    1: '10',
-                    3: '1000',
-                    5: '100000',
-                  }}
-                  value={this.iterationsToSlider(this.state.iterations)}
-                  tipFormatter={this.slideToIterations.bind(this)}
-                  onChange={(value) =>
-                    this.setState({
-                      iterations: this.slideToIterations(value as number),
-                    })
-                  }
-                ></Slider>
-              </Form.Item>
-              <Form.Item label="Random Seed">
-                <Switch
-                  checkedChildren={<CheckOutlined />}
-                  unCheckedChildren={<CloseOutlined />}
-                  checked={this.state.useRandomSeed}
-                  onChange={(value) =>
-                    this.setState({
-                      useRandomSeed: !!value,
-                    })
-                  }
+                <IterationSlider
+                  value={this.state.iterations}
+                  onChanged={(value) => this.setState({ iterations: value })}
                 />
               </Form.Item>
+              <Form.Item label="RNG Seed">
+                <SeedInput
+                  value={this.state.rngSeed}
+                  onChanged={(value) => this.setState({ rngSeed: value })}
+                />
+              </Form.Item>
+              <Row>
+                <Col span={24}>
+                  <Button
+                    block
+                    disabled={!window.location.hash}
+                    type="danger"
+                    onClick={() => {
+                      this.setState(App.defaultState);
+                    }}
+                  >
+                    Reset
+                  </Button>
+                </Col>
+              </Row>
             </Form>
           </Card>
           <Card

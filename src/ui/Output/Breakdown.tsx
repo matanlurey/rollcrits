@@ -1,68 +1,66 @@
 import React from 'react';
 import { Table } from 'antd';
 import * as stats from 'simple-statistics';
+import { AttackBranch, DefenseDie, DefenseStats } from '../../app/simulation';
+
+interface Defender extends DefenseStats {
+  name: string;
+}
 
 // TODO: Make customizable.
-const defending = [
-  { name: 'B1 Battle Droid', toWound: 5 / 6, armor: false },
-  { name: 'B2 Battle Droid', toWound: 5 / 6, armor: 1 },
-  { name: 'Rebel Trooper', toWound: 4 / 6, armor: false },
-  { name: 'Stormtrooper', toWound: 3 / 6, armor: false },
-  { name: 'Deathtrooper', toWound: 2 / 6, armor: false },
-  { name: 'Rebel AT-RT', toWound: 5 / 6, armor: true },
-  { name: 'X-34 Landpseeder', toWound: 4 / 6, armor: 2 },
-  { name: 'T-47 Airspeeder', toWound: 4 / 6, armor: true },
-  { name: 'Dewback Rider', toWound: 3 / 6, armor: 1 },
-  { name: 'Occupier Tank', toWound: 3 / 6, armor: true },
+const defending: Defender[] = [
+  { name: 'B1 Battle Droid', dice: DefenseDie.white() },
+  { name: 'B2 Battle Droid', dice: DefenseDie.white(), armor: 1 },
+  { name: 'Rebel Trooper', dice: DefenseDie.white(), surges: true },
+  { name: 'Stormtrooper', dice: DefenseDie.red() },
+  { name: 'Deathtrooper', dice: DefenseDie.red(), surges: true },
+  { name: 'Rebel AT-RT', dice: DefenseDie.white(), armor: true },
+  {
+    name: 'X-34 Landpseeder',
+    dice: DefenseDie.white(),
+    surges: true,
+    armor: 2,
+  },
+  { name: 'AT-ST', dice: DefenseDie.white(), surges: true, armor: true },
+  { name: 'Dewback Rider', dice: DefenseDie.red(), armor: 1 },
+  { name: 'Occupier Tank', dice: DefenseDie.red(), armor: true },
 ];
 
 export default (props: {
   mods: {
     impact: number;
   };
-  data: Array<{
-    netHits: number;
-    netCrits: number;
-  }>;
+  data: AttackBranch[];
 }) => {
-  // Determine average # of hits and crits.
-  const avgHits = stats.mean(props.data.map((d) => d.netHits));
-  const avgCrits = stats.mean(props.data.map((d) => d.netCrits));
-
   // Aggregate results per defending unit.
   const results: Array<{
     key: string;
-    name: string;
     cover0: string;
     cover1: string;
     cover2: string;
   }> = [];
 
   for (const defender of defending) {
-    let hits = avgHits;
-    let crits = avgCrits;
+    let woundsByCoverAmount: number[][] = [[], [], []];
 
-    if (defender.armor) {
-      if (defender.armor === true) {
-        // As many hits as you have impact, discard rest of hits.
-        hits = Math.max(0, props.mods.impact);
-      } else {
-        // Minimum number of hits is impact, max is hits - armor.
-        hits = Math.max(props.mods.impact, hits - defender.armor);
+    // For each amount of cover.
+    for (let cover = 0; cover < woundsByCoverAmount.length; cover++) {
+      // For each attacking dice pool.
+      for (const branch of props.data) {
+        // Add the number of expected wounds (v cover + defender).
+        woundsByCoverAmount[cover].push(branch.hits(cover, defender).wounds());
       }
     }
 
-    const total = hits + crits;
-    const cover0 = Math.max(0, total - 0) * defender.toWound;
-    const cover1 = Math.max(0, total - 1) * defender.toWound;
-    const cover2 = Math.max(0, total - 2) * defender.toWound;
+    const expectedWounds = woundsByCoverAmount.map((w) =>
+      stats.mean(w).toFixed(2),
+    );
 
     results.push({
       key: defender.name,
-      name: defender.name,
-      cover0: cover0.toFixed(1),
-      cover1: cover1.toFixed(1),
-      cover2: cover2.toFixed(1),
+      cover0: expectedWounds[0],
+      cover1: expectedWounds[1],
+      cover2: expectedWounds[2],
     });
   }
 
@@ -71,7 +69,7 @@ export default (props: {
     <Table
       bordered
       columns={[
-        { title: 'Defending', key: 'name', dataIndex: 'name' },
+        { title: 'Defending', key: 'nakeyme', dataIndex: 'key' },
         { title: 'No Cover', key: 'cover0', dataIndex: 'cover0' },
         { title: 'Cover 1', key: 'cover1', dataIndex: 'cover1' },
         { title: 'Cover 2', key: 'cover2', dataIndex: 'cover2' },

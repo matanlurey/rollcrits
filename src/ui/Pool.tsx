@@ -1,6 +1,6 @@
 import React from 'react';
 import { Form, InputNumber } from 'antd';
-import { AttackDiceConfig } from '../state/state';
+import { AttackDiceConfig } from '../app/state';
 
 function DiceInput(props: {
   label: React.ReactNode;

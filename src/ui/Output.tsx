@@ -2,15 +2,15 @@ import React from 'react';
 import { VictoryChart, VictoryBar, VictoryAxis } from 'victory';
 import * as stats from 'simple-statistics';
 import Breakdown from './Output/Breakdown';
-import { SimConfig } from '../state/state';
-import { simulate } from '../calc/simulate';
+import { SimConfig } from '../app/state';
+import { Simulation } from '../app/simulation';
 
 export default (props: { simulate: SimConfig }) => {
-  const data = simulate(props.simulate);
+  const data = new Simulation(props.simulate).simulate();
   const grouped: { [key: number]: number } = {};
   const ticks = new Set<number>();
   for (const result of data) {
-    const hits = result.netCrits + result.netHits;
+    const hits = result.rawTotalHits;
     grouped[hits] = (grouped[hits] || 0) + 1;
     ticks.add(hits);
   }
@@ -36,7 +36,7 @@ export default (props: { simulate: SimConfig }) => {
         />
         <VictoryAxis
           label={`μ Hits: ${stats
-            .mean(data.map((d) => d.netHits + d.netCrits))
+            .mean(data.map((d) => d.rawTotalHits))
             .toFixed(1)}`}
           style={{
             axisLabel: { padding: 30 },
