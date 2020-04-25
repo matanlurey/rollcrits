@@ -1,5 +1,8 @@
 import React from 'react';
 import { Table } from 'antd';
+
+import './Breakdown.scss';
+
 import * as stats from 'simple-statistics';
 import { AttackBranch, DefenseDie, DefenseStats } from '../../app/simulation';
 
@@ -9,6 +12,10 @@ interface Defender extends DefenseStats {
 
 // TODO: Make customizable.
 const defending: Defender[] = [
+  // Used as a benchmark for a unit that never rolls saves.
+  { name: 'Expected Hits', dice: DefenseDie.none() },
+
+  // Sample units.
   { name: 'B1 Battle Droid', dice: DefenseDie.white() },
   { name: 'B2 Battle Droid', dice: DefenseDie.white(), armor: 1 },
   { name: 'Rebel Trooper', dice: DefenseDie.white(), surges: true },
@@ -64,7 +71,8 @@ export default (props: {
     });
   }
 
-  // Add
+  // Add the expected hits independent of the defending unit.
+
   return (
     <Table
       bordered

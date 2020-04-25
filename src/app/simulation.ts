@@ -117,6 +117,10 @@ export class DefenseDie {
     return new DefenseDie(DefenseDieType.white);
   }
 
+  static none(): DefenseDie {
+    return new DefenseDie([DefenseDieSide.blank]);
+  }
+
   private constructor(private readonly sides: DefenseDieSide[]) {}
 
   /**

@@ -1,6 +1,5 @@
 import React from 'react';
 import { VictoryChart, VictoryBar, VictoryAxis } from 'victory';
-import * as stats from 'simple-statistics';
 import Breakdown from './Output/Breakdown';
 import { SimConfig } from '../app/state';
 import { Simulation } from '../app/simulation';
@@ -35,9 +34,6 @@ export default (props: { simulate: SimConfig }) => {
           }}
         />
         <VictoryAxis
-          label={`μ Hits: ${stats
-            .mean(data.map((d) => d.rawTotalHits))
-            .toFixed(1)}`}
           style={{
             axisLabel: { padding: 30 },
           }}
