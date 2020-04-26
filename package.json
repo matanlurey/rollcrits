@@ -1,7 +1,7 @@
 {
   "name": "rollcrits",
   "version": "0.1.0",
-  "homepage": "https://matanlurey.github.io/rollcrits",
+  "homepage": "https://rollcrits.com",
   "repository": "git@github.com:matanlurey/rollcrits.git",
   "private": true,
   "dependencies": {
