@@ -1,6 +1,7 @@
 import React from 'react';
 import { Form, Select, InputNumber, Divider } from 'antd';
 import { AttackDiceModifiers } from '../app/state';
+import { AttackDieSide } from '../app/simulation';
 
 const { Option } = Select;
 
@@ -25,9 +26,9 @@ export default (props: {
             });
           }}
         >
-          <Option value="none">None</Option>
-          <Option value="hit">Hit</Option>
-          <Option value="crit">Crit</Option>
+          <Option value={AttackDieSide.blank}>None</Option>
+          <Option value={AttackDieSide.hit}>Hit</Option>
+          <Option value={AttackDieSide.crit}>Crit</Option>
         </Select>
       </Form.Item>
       <Divider />
