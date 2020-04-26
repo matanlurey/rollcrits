@@ -66,20 +66,10 @@ interface BreakdownProps {
     impact: number;
   };
   data: AttackBranch[];
+  showDefenderDetails: boolean;
 }
 
-interface BreakdownState {
-  showUnitStats: boolean;
-}
-
-export default class extends React.Component<BreakdownProps, BreakdownState> {
-  constructor(props: BreakdownProps) {
-    super(props);
-    this.state = {
-      showUnitStats: true,
-    };
-  }
-
+export default class extends React.Component<BreakdownProps> {
   render() {
     // Aggregate results per defending unit.
     const results: Array<{
@@ -132,7 +122,7 @@ export default class extends React.Component<BreakdownProps, BreakdownState> {
               <Media
                 query="(min-width: 499px)"
                 render={() => (
-                  <Col span={24} hidden={!this.state.showUnitStats}>
+                  <Col span={24} hidden={!this.props.showDefenderDetails}>
                     {renderTags(unit)}
                   </Col>
                 )}

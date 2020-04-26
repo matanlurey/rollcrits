@@ -1,10 +1,10 @@
 import React from 'react';
 import { VictoryChart, VictoryBar, VictoryAxis } from 'victory';
 import Breakdown from './Output/Breakdown';
-import { SimConfig } from '../app/state';
+import { AppConfig } from '../app/state';
 import { Simulation } from '../app/simulation';
 
-export default (props: { simulate: SimConfig }) => {
+export default (props: { simulate: AppConfig }) => {
   const data = new Simulation(props.simulate).simulate();
   const grouped: { [key: number]: number } = {};
   const ticks = new Set<number>();
@@ -44,6 +44,7 @@ export default (props: { simulate: SimConfig }) => {
         mods={{
           impact: props.simulate.modifiers.impact,
         }}
+        showDefenderDetails={props.simulate.settings.showDefenderDetails}
       />
     </>
   );

@@ -2,15 +2,15 @@ import React from 'react';
 import GitInfo from 'react-git-info/macro';
 import { Layout, Card, Form, Button, Row, Col } from 'antd';
 import {
-  SettingOutlined,
   StarOutlined,
   EditOutlined,
   AppstoreOutlined,
+  SlidersOutlined,
 } from '@ant-design/icons';
 
 import './App.scss';
 
-import { SimConfig, encodeConfig, decodeConfig } from './state';
+import { AppConfig, encodeConfig, decodeConfig } from './state';
 import Pool from '../ui/Pool';
 import Output from '../ui/Output';
 import Modifiers from '../ui/Modifiers';
@@ -19,11 +19,12 @@ import Prando from 'prando';
 import SeedInput from '../ui/SeedInput';
 import { AttackDieSide } from './simulation';
 import Tokens from '../ui/Tokens';
+import Settings from '../ui/Settings';
 
 const { Sider } = Layout;
 
-class App extends React.Component<{}, SimConfig> {
-  public static readonly defaultState: SimConfig = Object.freeze({
+class App extends React.Component<{}, AppConfig> {
+  public static readonly defaultState: AppConfig = Object.freeze({
     pool: {
       red: 1,
       black: 1,
@@ -44,6 +45,9 @@ class App extends React.Component<{}, SimConfig> {
     },
     iterations: 10000,
     rngSeed: `${new Prando().nextString(10)}`,
+    settings: {
+      showDefenderDetails: false,
+    },
   });
 
   private static readonly defaultEncodedState = encodeConfig(App.defaultState);
@@ -75,13 +79,26 @@ class App extends React.Component<{}, SimConfig> {
           style={{ minHeight: '100vh', height: '100%' }}
         >
           <div className="logo">
-            <strong>RollCrits</strong> #{App.shortHash}
+            <Row>
+              <Col span={10}>
+                <strong>RollCrits</strong>
+              </Col>
+              <Col span={10}>#{App.shortHash}</Col>
+              <Col span={2}>
+                <Settings
+                  settings={this.state.settings}
+                  onChange={(settings) => {
+                    this.setState({ settings });
+                  }}
+                />
+              </Col>
+            </Row>
           </div>
           <Card
             title={
               <span>
-                <SettingOutlined />
-                <span> Settings</span>
+                <SlidersOutlined />
+                <span> Simulation</span>
               </span>
             }
           >

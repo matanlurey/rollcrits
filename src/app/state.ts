@@ -6,7 +6,7 @@ export let sessionRngSeed = new Prando().nextString(10);
 /**
  * Simulation-wide state (or configuration).
  */
-export interface SimConfig {
+export interface AppConfig {
   /**
    * Attacking dice pool.
    */
@@ -28,9 +28,18 @@ export interface SimConfig {
   rngSeed: string;
 
   /**
+   * Application-wide settings.
+   */
+  settings: AppSettings;
+
+  /**
    * Tokens available to spend.
    */
   tokens: AttackerTokens;
+}
+
+export interface AppSettings {
+  showDefenderDetails: boolean;
 }
 
 /**
@@ -38,7 +47,7 @@ export interface SimConfig {
  *
  * @param config
  */
-export function encodeConfig(config: SimConfig): string {
+export function encodeConfig(config: AppConfig): string {
   return btoa(JSON.stringify(config));
 }
 
@@ -47,7 +56,7 @@ export function encodeConfig(config: SimConfig): string {
  *
  * Returns {undefined} if there was no stored configuration.
  */
-export function decodeConfig(fragment: string): SimConfig | undefined {
+export function decodeConfig(fragment: string): AppConfig | undefined {
   let urlState = window.location.hash;
   if (urlState) {
     const fragment = urlState.indexOf('#');

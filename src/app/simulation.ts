@@ -1,5 +1,5 @@
 import Prando from 'prando';
-import { SimConfig, AttackDiceModifiers, AttackerTokens } from './state';
+import { AppConfig, AttackDiceModifiers, AttackerTokens } from './state';
 
 /**
  * Sides of an attack die.
@@ -281,7 +281,7 @@ export class DefenseBranch {
 export class Simulation {
   private readonly rng: Prando;
 
-  constructor(private readonly config: SimConfig) {
+  constructor(private readonly config: AppConfig) {
     this.rng = new Prando(config.rngSeed);
   }
 
