@@ -74,7 +74,9 @@ class App extends React.Component<{}, { config: Config }> {
               <Col span={10}>
                 <strong>RollCrits</strong>
               </Col>
-              <Col span={10}>#{App.shortHash}</Col>
+              <Col span={12} style={{ textAlign: 'right' }}>
+                #{App.shortHash}
+              </Col>
             </Row>
           </div>
           <Card

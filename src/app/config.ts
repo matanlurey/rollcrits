@@ -27,7 +27,7 @@ export class Config {
 
   static fromUrl(onChanged: (config: Config) => void): Config {
     const path = window.location.pathname.split('/').splice(1);
-    const pool: DicePool = {
+    let pool: DicePool = {
       red: 0,
       black: 0,
       white: 0,
@@ -50,42 +50,48 @@ export class Config {
             break;
         }
       }
+    } else {
+      pool = _.cloneDeep(Config.defaultInputs.attackPool);
     }
-    const mods = _.cloneDeep(Config.defaultInputs.attackMods);
-    if (path[1]) {
-      path[1]
-        .split(',')
-        .map((mod) => mod.split(':'))
-        .forEach((pair) => {
-          (mods as any)[pair[0]] = (mods as any)[pair[1]];
-        });
-    }
-    const tokens = _.cloneDeep(Config.defaultInputs.attackTokens) as any;
-    if (path[2]) {
-      path[2]
-        .split(',')
-        .map((mod) => mod.split(':'))
-        .forEach((pair) => {
-          tokens[pair[0]] = tokens[pair[1]];
-        });
-    }
-    const search = window.location.search;
+    const mods: AttackModifiers = {
+      ..._.cloneDeep(Config.defaultInputs.attackMods),
+      ...Config.readVars(path[1], ',', ':'),
+    };
+    const tokens: AttackTokens = {
+      ..._.cloneDeep(Config.defaultInputs.attackTokens),
+      ...Config.readVars(path[2], ',', ':'),
+    };
     const globals = {
-      iterations: 1000,
+      iterations: Config.defaultInputs.iterations,
       randomSeed: Config.defaultInputs.randomSeed,
-    } as any;
-    search
-      .split('&')
-      .map((v) => v.split('='))
-      .forEach((pair) => {
-        globals[pair[0]] = pair[1];
-      });
+      ...Config.readVars(window.location.search, '&', '='),
+    };
     return new Config(onChanged, {
       attackMods: mods,
       attackPool: pool,
       attackTokens: tokens,
       ...globals,
     });
+  }
+
+  private static readVars(
+    source: string | undefined,
+    each: string,
+    assignment: string,
+  ): {} {
+    const output: { [index: string]: string | number | boolean } = {};
+    if (!source) {
+      return output;
+    }
+    source
+      .split(each)
+      .map((v) => v.split(assignment))
+      .forEach((pair) => {
+        const key: string = pair[0];
+        const value: string | number | boolean = pair[1];
+        output[key] = value;
+      });
+    return output;
   }
 
   constructor(
