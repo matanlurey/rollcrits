@@ -9,43 +9,12 @@ import { AttackBranch, DefenseDie, DefenseStats } from '../../app/simulation';
 import ColumnGroup from 'antd/lib/table/ColumnGroup';
 import Column from 'antd/lib/table/Column';
 import { CaretDownOutlined } from '@ant-design/icons';
+import { DefenderPresetKeys } from '../../app/config';
+import { presets } from '../../app/defenders';
 
 interface Defender extends DefenseStats {
   name: string;
 }
-
-// TODO: Make customizable.
-const defending: Defender[] = [
-  // Sample units.
-  { name: 'B1 Battle Droid', dice: DefenseDie.white },
-  { name: 'B2 Battle Droid', dice: DefenseDie.white, armor: 1 },
-  { name: 'Rebel Trooper', dice: DefenseDie.white, surges: true },
-  { name: 'Stormtrooper', dice: DefenseDie.red },
-  { name: 'Deathtrooper', dice: DefenseDie.red, surges: true },
-  {
-    name: 'Boba Fett',
-    dice: DefenseDie.red,
-    surges: true,
-    pierce: 'impervious',
-  },
-  { name: 'Darth Vader', dice: DefenseDie.red, pierce: 'immune' },
-  {
-    name: 'Emperor Palpatine',
-    dice: DefenseDie.red,
-    pierce: 'immune',
-    surges: true,
-  },
-  { name: 'Rebel AT-RT', dice: DefenseDie.white, armor: true },
-  {
-    name: 'X-34 Landpseeder',
-    dice: DefenseDie.white,
-    surges: true,
-    armor: 2,
-  },
-  { name: 'AT-ST', dice: DefenseDie.white, surges: true, armor: true },
-  { name: 'Dewback Rider', dice: DefenseDie.red, armor: 1 },
-  { name: 'Occupier Tank', dice: DefenseDie.red, armor: true },
-];
 
 function compareStrings(a: string, b: string) {
   if (a > b) {
@@ -66,6 +35,7 @@ interface BreakdownProps {
     impact: number;
   };
   data: AttackBranch[];
+  defenders: DefenderPresetKeys;
   showDefenderDetails: boolean;
 }
 
@@ -79,6 +49,8 @@ export default class extends React.Component<BreakdownProps> {
       cover1: string;
       cover2: string;
     }> = [];
+
+    const defending = presets[this.props.defenders];
 
     for (const defender of defending) {
       let woundsByCoverAmount: number[][] = [[], [], []];

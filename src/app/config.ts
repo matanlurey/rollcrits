@@ -7,6 +7,7 @@ export class Config {
   private static readonly defaultInputs = Object.freeze({
     attackMods: Object.freeze({
       critical: 0,
+      highVelocity: false,
       impact: 0,
       pierce: 0,
       precise: 0,
@@ -21,6 +22,7 @@ export class Config {
       aim: 0,
       surge: 0,
     }),
+    defenders: 'standard',
     iterations: 10000,
     randomSeed: new Prando().nextString(10),
   }) as Inputs;
@@ -64,6 +66,7 @@ export class Config {
     const globals = {
       iterations: Config.defaultInputs.iterations,
       randomSeed: Config.defaultInputs.randomSeed,
+      defenders: Config.defaultInputs.defenders,
       ...Config.readVars(window.location.search, '&', '='),
     };
     return new Config(onChanged, {
@@ -116,6 +119,7 @@ export class Config {
       '?' +
       [
         `iterations=${this.mInputs.iterations}`,
+        `defenders=${this.mInputs.defenders}`,
         `randomSeed=${this.mInputs.randomSeed}`,
       ].join('&')
     );
@@ -203,6 +207,11 @@ export interface Inputs {
   attackTokens: AttackTokens;
 
   /**
+   * Defending units.
+   */
+  defenders: DefenderPresetKeys;
+
+  /**
    * The number of times to roll each attack (per defender/cover, etc).
    */
   iterations: number;
@@ -212,6 +221,17 @@ export interface Inputs {
    */
   randomSeed: string;
 }
+
+/**
+ * Built-in presets of defenders to test against.
+ */
+export type DefenderPresetKeys =
+  | 'standard'
+  | 'danger-sense'
+  | 'aggressive-tactics'
+  | 'jedi'
+  | 'rex-star'
+  | 'debug';
 
 export interface DicePool {
   red: number;
@@ -224,6 +244,11 @@ export interface AttackModifiers {
    * Converts up to X {@link AttackDieSide.surge} to {@link AttackDieSide.crit}.
    */
   critical: number;
+
+  /**
+   * Whether to prevent spending dodge tokens.
+   */
+  highVelocity: boolean;
 
   /**
    * Allows penetrating/ignoring the "armor" keyword.

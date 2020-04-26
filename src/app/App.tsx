@@ -1,6 +1,6 @@
 import React from 'react';
 import GitInfo from 'react-git-info/macro';
-import { Layout, Card, Form, Button, Row, Col } from 'antd';
+import { Layout, Card, Form, Button, Row, Col, Select, Typography } from 'antd';
 import {
   StarOutlined,
   EditOutlined,
@@ -93,6 +93,43 @@ class App extends React.Component<{}, { config: Config }> {
                   value={inputs.iterations}
                   onChanged={(v) => setInputs((i) => (i.iterations = v))}
                 />
+              </Form.Item>
+              <Form.Item label="Defenders">
+                <Select
+                  value={inputs.defenders}
+                  onChange={(v) => setInputs((i) => (i.defenders = v))}
+                >
+                  <Select.Option value="standard">
+                    <div>Standard</div>
+                    <Typography.Text type="secondary">
+                      A wide array of units.
+                    </Typography.Text>
+                  </Select.Option>
+                  <Select.Option value="danger-sense">
+                    <div>Danger Sense</div>
+                    <Typography.Text type="secondary">
+                      Unusual defensive buffs.
+                    </Typography.Text>
+                  </Select.Option>
+                  <Select.Option value="aggressive-tactics">
+                    <div>Aggressive Tactics</div>
+                    <Typography.Text type="secondary">
+                      Defensive surge tokens.
+                    </Typography.Text>
+                  </Select.Option>
+                  <Select.Option value="jedi">
+                    <div>Jedi</div>
+                    <Typography.Text type="secondary">
+                      Deflect and Guardian.
+                    </Typography.Text>
+                  </Select.Option>
+                  <Select.Option value="rex-star">
+                    <div>Rex Star</div>
+                    <Typography.Text type="secondary">
+                      Unusual amount of tokens.
+                    </Typography.Text>
+                  </Select.Option>
+                </Select>
               </Form.Item>
               <Form.Item label="RNG Seed">
                 <SeedInput

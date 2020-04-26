@@ -1,5 +1,5 @@
 import React from 'react';
-import { Form, Select, InputNumber, Divider } from 'antd';
+import { Form, Select, InputNumber, Divider, Switch } from 'antd';
 import { AttackModifiers } from '../app/config';
 
 const { Option } = Select;
@@ -39,6 +39,17 @@ export default (props: {
             props.onChanged({
               ...props.modifiers,
               critical: value === 0 ? 0 : value || props.modifiers.critical,
+            });
+          }}
+        />
+      </Form.Item>
+      <Form.Item label="High Velocity">
+        <Switch
+          checked={props.modifiers.highVelocity}
+          onChange={(value) => {
+            props.onChanged({
+              ...props.modifiers,
+              highVelocity: value,
             });
           }}
         />

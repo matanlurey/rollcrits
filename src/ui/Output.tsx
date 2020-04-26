@@ -41,6 +41,7 @@ export default (props: { simulate: Inputs }) => {
       </VictoryChart>
       <Breakdown
         data={data}
+        defenders={props.simulate.defenders}
         mods={{
           impact: props.simulate.attackMods.impact,
         }}

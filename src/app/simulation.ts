@@ -67,14 +67,40 @@ export class DefenseDie {
 
 export interface DefenseStats {
   /**
+   * How many extra dice are rolled.
+   */
+  extraDice?: number | { [key in 'white' | 'red']: number };
+
+  /**
    * Type of defense die
    */
   dice: DefenseDie;
 
   /**
+   * How many dodge tokens and dodge-related defensive bonuses.
+   */
+  dodge?:
+    | number
+    | {
+        deflect?: true;
+        outmanuever?: true;
+        tokens: number;
+      };
+
+  /**
+   * Number of hits that may be guardian-d away.
+   */
+  guardian?: number;
+
+  /**
    * Set if the die surge-side is considered a block.
    */
-  surges?: true;
+  surges?: true | number;
+
+  /**
+   * Number of shield tokens.
+   */
+  shield?: number;
 
   /**
    * Set if numerical or unlimited armor.
@@ -151,14 +177,7 @@ export class AttackBranch {
         switch (results[i].roll) {
           // Next, re-roll hits, sometimes.
           case 'hit':
-            if (
-              this.shouldRerollHit(
-                results[i].dice,
-                critical,
-                soFar,
-                optimizeFor,
-              )
-            ) {
+            if (this.shouldRerollHit(soFar, optimizeFor)) {
               rerollDice(results[i]);
             }
             break;
@@ -169,13 +188,25 @@ export class AttackBranch {
 
   // FYI: If we are entering this function, we have no blanks left.
   private shouldRerollHit(
-    die: AttackDie,
-    criticalLeft: number,
     soFar: { hits: number; crits: number },
     against: { cover: number; defender: DefenseStats },
   ): boolean {
     // If we have already maxed out our impact against armor, re-roll for crits.
     let willCancel = against.cover;
+
+    if (against.defender.dodge && !this.modifiers.highVelocity) {
+      const dodge = against.defender.dodge;
+      if (typeof dodge === 'number') {
+        willCancel += dodge;
+      } else if (!dodge.outmanuever) {
+        willCancel += dodge.tokens;
+      }
+    }
+
+    if (against.defender.guardian) {
+      willCancel += against.defender.guardian;
+    }
+
     if (against.defender.armor === true) {
       willCancel += Math.max(0, soFar.hits - this.modifiers.impact);
     }
@@ -275,7 +306,40 @@ export class AttackBranch {
     });
 
     // Reduce hits by the amount of static cover, to a minimum of 0.
-    hits = Math.max(0, hits - cover);
+    hits -= cover;
+
+    // Reduce hits or crits by the amount of dodges, to a minimum of 0.
+    let activatedDeflect = false;
+    if (defender.dodge && !this.modifiers.highVelocity) {
+      const dodge = defender.dodge;
+      let tokens: number;
+      let cancelCrits: boolean;
+      if (typeof dodge === 'number') {
+        tokens = dodge;
+        cancelCrits = false;
+      } else {
+        tokens = dodge.tokens;
+        cancelCrits = !!dodge.outmanuever;
+        if (dodge.deflect) {
+          activatedDeflect = true;
+        }
+      }
+      while (tokens) {
+        if (crits && cancelCrits) {
+          crits--;
+        } else {
+          hits--;
+        }
+        tokens--;
+      }
+    }
+
+    // Reduce hits by guardian.
+    hits -= defender.guardian || 0;
+
+    // Ensure neither hits or crits is < 0.
+    hits = Math.max(0, hits);
+    crits = Math.max(0, crits);
 
     // If `armor`, convert hits to crits, and deplete all or some hits.
     if (defender.armor) {
@@ -294,6 +358,13 @@ export class AttackBranch {
 
     // Final number of dice that will need to be rolled for wounds.
     // TODO: Consider returning multiple branches per attack.
+    if (activatedDeflect) {
+      defender = {
+        ...defender,
+        surges: true,
+      };
+    }
+
     return new DefenseBranch(
       this.rng,
       hits + crits,
@@ -324,7 +395,21 @@ export class DefenseBranch {
     if (this.stats.pierce === 'impervious') {
       hits += this.pierce;
     }
-    return Array(hits).fill(this.stats.dice);
+    const result = Array(hits).fill(this.stats.dice);
+    if (this.stats.extraDice) {
+      const extraDice = this.stats.extraDice;
+      if (typeof extraDice === 'number') {
+        return result.concat(Array(extraDice).fill(this.stats.dice));
+      } else {
+        for (let i = 0; i < extraDice.white; i++) {
+          result.push(DefenseDie.white);
+        }
+        for (let i = 0; i < extraDice.red; i++) {
+          result.push(DefenseDie.red);
+        }
+      }
+    }
+    return result;
   }
 
   /**
@@ -332,6 +417,7 @@ export class DefenseBranch {
    */
   wounds(): number {
     let blocks = 0;
+    let blanks = 0;
 
     for (const die of this.generateDefenseDice()) {
       switch (die.roll(this.rng)) {
@@ -341,19 +427,29 @@ export class DefenseBranch {
         case 'surge':
           if (this.stats.surges) {
             blocks++;
+          } else {
+            blanks++;
           }
           break;
         case 'blank':
+          blanks++;
           break;
       }
     }
 
-    if (this.pierce && this.stats.pierce !== 'immune') {
+    const vunerableToPierce = this.stats.pierce !== 'immune';
+    if (this.pierce && vunerableToPierce) {
       blocks = Math.max(0, blocks - this.pierce);
     }
 
-    // Future-proof against things like danger sense, a minimum of 0 wounds.
-    return Math.max(0, this.hits - blocks);
+    if (this.stats.shield && blanks) {
+      const shielded = Math.min(this.stats.shield, blanks);
+      blocks += shielded;
+      blanks -= shielded;
+    }
+
+    const wounds = this.hits - blocks;
+    return Math.max(0, wounds);
   }
 }
 
