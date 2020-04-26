@@ -17,7 +17,7 @@ export default (props: { simulate: AppConfig }) => {
     <>
       <VictoryChart
         animate={{ duration: 1000 }}
-        domainPadding={{ x: 15 }}
+        domainPadding={{ x: 25 }}
         height={200}
       >
         <VictoryBar

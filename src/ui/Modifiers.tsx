@@ -83,22 +83,18 @@ export default (props: {
           }}
         />
       </Form.Item>
-      {/*
-        TODO: Enable aim tokens.
-
-        <Form.Item label="Precise">
-          <InputNumber
-            value={props.modifiers.precise}
-            min={0}
-            onChange={(value) => {
-              props.onChanged({
-                ...props.modifiers,
-                precise: value === 0 ? 0 : value || props.modifiers.precise,
-              });
-            }}
-          />
-        </Form.Item>
-      */}
+      <Form.Item label="Precise">
+        <InputNumber
+          value={props.modifiers.precise}
+          min={0}
+          onChange={(value) => {
+            props.onChanged({
+              ...props.modifiers,
+              precise: value === 0 ? 0 : value || props.modifiers.precise,
+            });
+          }}
+        />
+      </Form.Item>
     </Form>
   );
 };

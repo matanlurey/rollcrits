@@ -148,13 +148,139 @@ export class AttackBranch {
     private readonly tokens: AttackerTokens,
   ) {}
 
-  private aggregateDice(): { hits: number; crits: number } {
-    let hits = 0;
-    let crits = 0;
+  /**
+   * Mutates the provided array applying an "aim".
+   */
+  private applyAimToken(
+    results: Array<{ dice: AttackDie; roll: AttackDieSide }>,
+    soFar: { hits: number; crits: number },
+    modify: number,
+    critical: number,
+    surgeTokens: number,
+    optimizeFor?: {
+      cover: number;
+      defender: DefenseStats;
+    },
+  ): void {
+    const rerollDice = (result: { dice: AttackDie; roll: AttackDieSide }) => {
+      let roll = result.dice.roll(this.rng);
+
+      // TODO: Share code with aggregateDice.
+      if (roll === AttackDieSide.surge) {
+        if (critical) {
+          roll = AttackDieSide.crit;
+          critical--;
+        } else if (this.modifiers.surge !== 'blank' && surgeTokens) {
+          roll = AttackDieSide.hit;
+          surgeTokens--;
+        } else {
+          roll = this.modifiers.surge;
+        }
+      }
+
+      result.roll = roll;
+      modify--;
+    };
+
+    // Assume the results are sorted where it goes RBW. First roll all blanks.
+    for (let i = 0; i < results.length; i++) {
+      if (!modify) {
+        break;
+      }
+      switch (results[i].roll) {
+        // Always re-roll blanks. Conversions already applied.
+        case AttackDieSide.blank:
+          rerollDice(results[i]);
+          break;
+      }
+    }
+
+    // If we aren't just going for a vanity stat, we might want to roll crits.
+    if (optimizeFor) {
+      for (let i = 0; i < results.length; i++) {
+        if (!modify) {
+          break;
+        }
+        switch (results[i].roll) {
+          // Next, re-roll hits, sometimes.
+          case AttackDieSide.hit:
+            if (
+              this.shouldRerollHit(
+                results[i].dice,
+                critical,
+                soFar,
+                optimizeFor,
+              )
+            ) {
+              rerollDice(results[i]);
+            }
+            break;
+        }
+      }
+    }
+  }
+
+  // FYI: If we are entering this function, we have no blanks left.
+  private shouldRerollHit(
+    die: AttackDie,
+    criticalLeft: number,
+    soFar: { hits: number; crits: number },
+    against: { cover: number; defender: DefenseStats },
+  ): boolean {
+    // If we have already maxed out our impact against armor, re-roll for crits.
+    let willCancel = against.cover;
+    if (against.defender.armor === true) {
+      willCancel += Math.max(0, soFar.hits - this.modifiers.impact);
+    }
+
+    // If cover/armor would cancel all our hits, re-roll for crits.
+    if (willCancel >= soFar.hits) {
+      return true;
+    }
+
+    // TODO: This function is far from optimal, and very confusing.
+    return false;
+  }
+
+  private aggregateDice(optimizeFor?: {
+    cover: number;
+    defender: DefenseStats;
+  }): { hits: number; crits: number } {
+    // Make a copy of the results.
+    const results = this.result.map((e) => {
+      return {
+        dice: e.dice,
+        roll: e.roll,
+      };
+    });
+
+    // Count tokens.
     let critical = this.modifiers.critical;
     let surgeTokens = this.tokens.surge;
 
-    for (const result of this.result) {
+    // Aggregate total hits and crits at this point.
+    let hits = 0;
+    let crits = 0;
+
+    // May be called to aggregate the total hits/crits.
+    const aggregateHits = () => {
+      hits = 0;
+      crits = 0;
+      for (const result of results) {
+        switch (result.roll) {
+          case AttackDieSide.crit:
+            crits++;
+            break;
+          case AttackDieSide.hit:
+            hits++;
+            break;
+        }
+      }
+    };
+
+    // Reverse order, apply surges/critical to our worst dice (white) first.
+    for (let i = results.length - 1; i >= 0; i--) {
+      const result = results[i];
       let { roll } = result;
 
       if (roll === AttackDieSide.surge) {
@@ -169,20 +295,26 @@ export class AttackBranch {
         }
       }
 
-      // TODO: Implement aim tokens.
-
-      switch (roll) {
-        case AttackDieSide.crit:
-          crits++;
-          break;
-        case AttackDieSide.hit:
-          hits++;
-          break;
-        case AttackDieSide.blank:
-          break;
-      }
+      result.roll = roll;
     }
 
+    let aims = this.tokens.aim;
+    while (aims) {
+      // We'll need to know how many hits/crits so far.
+      aggregateHits();
+      this.applyAimToken(
+        results,
+        { hits, crits },
+        2 + this.modifiers.precise,
+        critical,
+        surgeTokens,
+        optimizeFor,
+      );
+      aims--;
+    }
+
+    // One final time.
+    aggregateHits();
     return { hits, crits };
   }
 
@@ -190,7 +322,10 @@ export class AttackBranch {
    * Returns the computed number of hits given cover and defense stats.
    */
   hits(cover: number, defender: DefenseStats): DefenseBranch {
-    let { hits, crits } = this.aggregateDice();
+    let { hits, crits } = this.aggregateDice({
+      cover,
+      defender,
+    });
 
     // Reduce hits by the amount of static cover, to a minimum of 0.
     hits = Math.max(0, hits - cover);
