@@ -1,8 +1,6 @@
 import React from 'react';
 import { Slider } from 'antd';
 
-import App from '../app/App';
-
 function iterationsToSlider(iterations: number): number {
   return iterations.toString().length - 1;
 }
@@ -19,8 +17,9 @@ function slideToIterations(slider: number): number {
       return 10000;
     case 5:
       return 100000;
+    // TODO: Log.
     default:
-      return App.defaultState.iterations;
+      return 10000;
   }
 }
 

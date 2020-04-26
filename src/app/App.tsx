@@ -10,66 +10,57 @@ import {
 
 import './App.scss';
 
-import { AppConfig, encodeConfig, decodeConfig } from './state';
 import Pool from '../ui/Pool';
 import Output from '../ui/Output';
 import Modifiers from '../ui/Modifiers';
 import IterationSlider from '../ui/IterationSlider';
-import Prando from 'prando';
 import SeedInput from '../ui/SeedInput';
-import { AttackDieSide } from './simulation';
 import Tokens from '../ui/Tokens';
-import Settings from '../ui/Settings';
+import { Config } from './config';
 
 const { Sider } = Layout;
 
-class App extends React.Component<{}, AppConfig> {
-  public static readonly defaultState: AppConfig = Object.freeze({
-    pool: {
-      red: 1,
-      black: 1,
-      white: 1,
-    },
-    modifiers: {
-      critical: 0,
-      impact: 0,
-      marksman: false,
-      pierce: 0,
-      precise: 0,
-      surge: AttackDieSide.blank,
-    },
-    tokens: {
-      surge: 0,
-      aim: 0,
-      dodge: 0,
-    },
-    iterations: 10000,
-    rngSeed: `${new Prando().nextString(10)}`,
-    settings: {
-      showDefenderDetails: false,
-    },
-  });
-
-  private static readonly defaultEncodedState = encodeConfig(App.defaultState);
+class App extends React.Component<{}, { config: Config }> {
+  private static readonly defaultConfigEncoded = new Config(
+    (_) => {},
+  ).encodeAsUrl();
   private static readonly shortHash = GitInfo().commit.shortHash;
 
   constructor(props: {}) {
     super(props);
-    const state = JSON.parse(JSON.stringify(App.defaultState));
-    this.state = { ...state, ...decodeConfig(window.location.hash) };
+    this.state = {
+      config: Config.fromUrl((c) => {
+        this.setState({ config: c });
+      }),
+    };
+    window.addEventListener('popstate', (e) => {
+      this.setState({
+        config: Config.fromUrl((c) => {
+          this.setState({ config: c });
+        }),
+      });
+      return false;
+    });
   }
 
-  encodeStateIfChanged() {
-    const encodedState = encodeConfig(this.state);
-    if (encodedState === App.defaultEncodedState) {
-      window.location.hash = 'default';
-    } else {
-      window.location.hash = encodedState;
+  private get allowResetState(): boolean {
+    const encodedState = this.state.config.encodeAsUrl();
+    return encodedState !== App.defaultConfigEncoded;
+  }
+
+  private encodeStateIfChanged() {
+    const encodedState = this.state.config.encodeAsUrl();
+    const currentState = `${window.location.pathname}${window.location.search}`;
+    if (encodedState !== currentState) {
+      window.history.pushState({}, '', `/${encodedState}`);
     }
   }
 
   render() {
     this.encodeStateIfChanged();
+    const config = this.state.config;
+    const inputs = config.inputs;
+    const setInputs = config.updateInputs.bind(this.state.config);
     return (
       <Layout style={{ minHeight: '100vh', height: '100%' }}>
         <Sider
@@ -84,14 +75,6 @@ class App extends React.Component<{}, AppConfig> {
                 <strong>RollCrits</strong>
               </Col>
               <Col span={10}>#{App.shortHash}</Col>
-              <Col span={2}>
-                <Settings
-                  settings={this.state.settings}
-                  onChange={(settings) => {
-                    this.setState({ settings });
-                  }}
-                />
-              </Col>
             </Row>
           </div>
           <Card
@@ -105,24 +88,24 @@ class App extends React.Component<{}, AppConfig> {
             <Form layout="vertical">
               <Form.Item label="Iterations">
                 <IterationSlider
-                  value={this.state.iterations}
-                  onChanged={(value) => this.setState({ iterations: value })}
+                  value={inputs.iterations}
+                  onChanged={(v) => setInputs((i) => (i.iterations = v))}
                 />
               </Form.Item>
               <Form.Item label="RNG Seed">
                 <SeedInput
-                  value={this.state.rngSeed}
-                  onChanged={(value) => this.setState({ rngSeed: value })}
+                  value={inputs.randomSeed}
+                  onChanged={(v) => setInputs((i) => (i.randomSeed = v))}
                 />
               </Form.Item>
               <Row>
                 <Col span={24}>
                   <Button
                     block
-                    disabled={window.location.hash === '#default'}
+                    disabled={!this.allowResetState}
                     type="danger"
                     onClick={() => {
-                      this.setState(App.defaultState);
+                      config.reset();
                     }}
                   >
                     Reset
@@ -140,12 +123,8 @@ class App extends React.Component<{}, AppConfig> {
             }
           >
             <Pool
-              dice={this.state.pool}
-              onChanged={(newDice) => {
-                this.setState({
-                  pool: newDice,
-                });
-              }}
+              dice={inputs.attackPool}
+              onChanged={(v) => setInputs((i) => (i.attackPool = v))}
             />
           </Card>
           <Card
@@ -157,12 +136,8 @@ class App extends React.Component<{}, AppConfig> {
             }
           >
             <Modifiers
-              modifiers={this.state.modifiers}
-              onChanged={(newModifiers) => {
-                this.setState({
-                  modifiers: newModifiers,
-                });
-              }}
+              modifiers={inputs.attackMods}
+              onChanged={(v) => setInputs((i) => (i.attackMods = v))}
             />
           </Card>
           <Card
@@ -174,19 +149,15 @@ class App extends React.Component<{}, AppConfig> {
             }
           >
             <Tokens
-              tokens={this.state.tokens}
-              onChanged={(newTokens) => {
-                this.setState({
-                  tokens: newTokens,
-                });
-              }}
+              tokens={inputs.attackTokens}
+              onChanged={(v) => setInputs((i) => (i.attackTokens = v))}
             />
           </Card>
         </Sider>
         <Layout>
           <Layout.Content style={{ margin: '24px 16px 0' }}>
             <div className="content-module">
-              <Output simulate={this.state} />
+              <Output simulate={inputs} />
             </div>
           </Layout.Content>
         </Layout>

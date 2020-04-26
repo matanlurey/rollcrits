@@ -1,13 +1,12 @@
 import React from 'react';
 import { Form, Select, InputNumber, Divider } from 'antd';
-import { AttackDiceModifiers } from '../app/state';
-import { AttackDieSide } from '../app/simulation';
+import { AttackModifiers } from '../app/config';
 
 const { Option } = Select;
 
 export default (props: {
-  modifiers: AttackDiceModifiers;
-  onChanged: (newModifiers: AttackDiceModifiers) => void;
+  modifiers: AttackModifiers;
+  onChanged: (newModifiers: AttackModifiers) => void;
 }) => {
   return (
     <Form
@@ -26,9 +25,9 @@ export default (props: {
             });
           }}
         >
-          <Option value={AttackDieSide.blank}>None</Option>
-          <Option value={AttackDieSide.hit}>Hit</Option>
-          <Option value={AttackDieSide.crit}>Crit</Option>
+          <Option value={'blank'}>None</Option>
+          <Option value={'hit'}>Hit</Option>
+          <Option value={'crit'}>Crit</Option>
         </Select>
       </Form.Item>
       <Divider />

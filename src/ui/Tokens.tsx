@@ -1,10 +1,10 @@
 import React from 'react';
 import { Form, InputNumber } from 'antd';
-import { AttackerTokens } from '../app/state';
+import { AttackTokens } from '../app/config';
 
 export default (props: {
-  tokens: AttackerTokens;
-  onChanged: (newModifiers: AttackerTokens) => void;
+  tokens: AttackTokens;
+  onChanged: (newModifiers: AttackTokens) => void;
 }) => {
   return (
     <Form

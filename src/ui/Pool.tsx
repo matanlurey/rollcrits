@@ -1,6 +1,6 @@
 import React from 'react';
 import { Form, InputNumber } from 'antd';
-import { AttackDiceConfig } from '../app/state';
+import { DicePool } from '../app/config';
 
 function DiceInput(props: {
   label: React.ReactNode;
@@ -49,12 +49,12 @@ export default class Pool extends React.Component<PoolProps> {
     );
   }
 
-  updateDice(newPool: Partial<AttackDiceConfig>) {
+  updateDice(newPool: Partial<DicePool>) {
     this.props.onChanged({ ...this.props.dice, ...newPool });
   }
 }
 
 export interface PoolProps {
-  readonly dice: AttackDiceConfig;
-  readonly onChanged: (pool: AttackDiceConfig) => void;
+  readonly dice: DicePool;
+  readonly onChanged: (pool: DicePool) => void;
 }

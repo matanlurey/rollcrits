@@ -6,6 +6,7 @@
   "private": true,
   "dependencies": {
     "antd": "^4.1.4",
+    "lodash": "^4.17.15",
     "prando": "^5.1.2",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
@@ -30,15 +31,18 @@
     "@testing-library/react": "^9.5.0",
     "@testing-library/user-event": "^7.2.1",
     "@types/jest": "^25.2.1",
+    "@types/lodash": "^4.14.150",
     "@types/node": "^13.13.0",
     "@types/react": "^16.9.34",
     "@types/react-dom": "^16.9.6",
     "@types/react-router-dom": "^5.1.4",
     "@types/victory": "^33.1.4",
+    "dayjs": "^1.8.25",
     "gh-pages": "^2.2.0",
     "node-sass": "^4.13.1",
     "prettier": "^2.0.4",
     "react-git-info": "^1.0.1",
+    "sass": "^1.26.5",
     "typescript": "^3.8.3"
   },
   "browserslist": {
