@@ -27,7 +27,7 @@ export default class Pool extends React.Component<PoolProps> {
       <Form
         labelCol={{
           xs: { span: 24 },
-          sm: { span: 8 },
+          sm: { span: 12 },
         }}
       >
         <DiceInput

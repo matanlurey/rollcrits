@@ -21,6 +21,19 @@ const defending: Defender[] = [
   { name: 'Rebel Trooper', dice: DefenseDie.white(), surges: true },
   { name: 'Stormtrooper', dice: DefenseDie.red() },
   { name: 'Deathtrooper', dice: DefenseDie.red(), surges: true },
+  {
+    name: 'Boba Fett',
+    dice: DefenseDie.red(),
+    surges: true,
+    pierce: 'impervious',
+  },
+  { name: 'Darth Vader', dice: DefenseDie.red(), pierce: 'immune' },
+  {
+    name: 'Emperor Palpatine',
+    dice: DefenseDie.red(),
+    pierce: 'immune',
+    surges: true,
+  },
   { name: 'Rebel AT-RT', dice: DefenseDie.white(), armor: true },
   {
     name: 'X-34 Landpseeder',
@@ -32,6 +45,20 @@ const defending: Defender[] = [
   { name: 'Dewback Rider', dice: DefenseDie.red(), armor: 1 },
   { name: 'Occupier Tank', dice: DefenseDie.red(), armor: true },
 ];
+
+function compareStrings(a: string, b: string) {
+  if (a > b) {
+    return 1;
+  }
+  if (a < b) {
+    return -1;
+  }
+  return 0;
+}
+
+function compareFloats(a: string, b: string) {
+  return Number.parseFloat(a) - Number.parseFloat(b);
+}
 
 export default (props: {
   mods: {
@@ -77,10 +104,30 @@ export default (props: {
     <Table
       bordered
       columns={[
-        { title: 'Defending', key: 'nakeyme', dataIndex: 'key' },
-        { title: 'No Cover', key: 'cover0', dataIndex: 'cover0' },
-        { title: 'Cover 1', key: 'cover1', dataIndex: 'cover1' },
-        { title: 'Cover 2', key: 'cover2', dataIndex: 'cover2' },
+        {
+          title: 'Defending',
+          key: 'key',
+          dataIndex: 'key',
+          sorter: (a, b) => compareStrings(a.key, b.key),
+        },
+        {
+          title: 'No Cover',
+          key: 'cover0',
+          dataIndex: 'cover0',
+          sorter: (a, b) => compareFloats(a.cover0, b.cover0),
+        },
+        {
+          title: 'Cover 1',
+          key: 'cover1',
+          dataIndex: 'cover1',
+          sorter: (a, b) => compareFloats(a.cover1, b.cover1),
+        },
+        {
+          title: 'Cover 2',
+          key: 'cover2',
+          dataIndex: 'cover2',
+          sorter: (a, b) => compareFloats(a.cover2, b.cover2),
+        },
       ]}
       dataSource={results}
       pagination={false}

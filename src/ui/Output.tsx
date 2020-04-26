@@ -42,7 +42,7 @@ export default (props: { simulate: SimConfig }) => {
       <Breakdown
         data={data}
         mods={{
-          impact: props.simulate.attackModifiers.impact,
+          impact: props.simulate.modifiers.impact,
         }}
       />
     </>

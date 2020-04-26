@@ -1,4 +1,5 @@
 import Prando from 'prando';
+import { AttackDieSide } from './simulation';
 
 export let sessionRngSeed = new Prando().nextString(10);
 
@@ -9,12 +10,12 @@ export interface SimConfig {
   /**
    * Attacking dice pool.
    */
-  attackPool: AttackDiceConfig;
+  pool: AttackDiceConfig;
 
   /**
    * Attacking dice pool modifiers.
    */
-  attackModifiers: AttackDiceModifiers;
+  modifiers: AttackDiceModifiers;
 
   /**
    * Number of times the dice should be rolled.
@@ -25,6 +26,11 @@ export interface SimConfig {
    * Random seed used for simulations.
    */
   rngSeed: string;
+
+  /**
+   * Tokens available to spend.
+   */
+  tokens: AttackerTokens;
 }
 
 /**
@@ -48,7 +54,7 @@ export function decodeConfig(fragment: string): SimConfig | undefined {
     if (fragment !== -1) {
       urlState = urlState.substring(fragment + 1);
     }
-    if (urlState && urlState.length) {
+    if (urlState && urlState.length && urlState !== 'default') {
       return JSON.parse(atob(urlState));
     }
   }
@@ -74,12 +80,49 @@ export interface AttackDiceConfig {
 
 export interface AttackDiceModifiers {
   /**
-   * What the `surge` icon the dice should convert to.
+   * How much critical the dice pool has.
    */
-  surge: 'none' | 'hit' | 'crit';
+  critical: number;
 
   /**
    * How much impact the dice pool has.
    */
   impact: number;
+
+  /**
+   * Whether the pool has marksman.
+   */
+  marksman: boolean;
+
+  /**
+   * How much pierce the dice pool has.
+   */
+  pierce: number;
+
+  /**
+   * How many additional dice may be re-rolled during an aim.
+   */
+  precise: number;
+
+  /**
+   * What the `surge` icon the dice should convert to.
+   */
+  surge: AttackDieSide.blank | AttackDieSide.hit | AttackDieSide.crit;
+}
+
+export interface AttackerTokens {
+  /**
+   * Aim tokens available.
+   */
+  aim: number;
+
+  /**
+   * Dodge tokens available.
+   */
+  dodge: number;
+
+  /**
+   * Surge tokens available.
+   */
+  surge: number;
 }

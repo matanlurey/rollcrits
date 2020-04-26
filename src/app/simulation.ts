@@ -1,5 +1,5 @@
 import Prando from 'prando';
-import { SimConfig, AttackDiceModifiers } from './state';
+import { SimConfig, AttackDiceModifiers, AttackerTokens } from './state';
 
 /**
  * Sides of an attack die.
@@ -84,18 +84,21 @@ export const DefenseDieType = {
  */
 export class AttackDie {
   static red(): AttackDie {
-    return new AttackDie(AttackDieType.red);
+    return new AttackDie(AttackDieType.red, 3);
   }
 
   static black(): AttackDie {
-    return new AttackDie(AttackDieType.black);
+    return new AttackDie(AttackDieType.black, 2);
   }
 
   static white(): AttackDie {
-    return new AttackDie(AttackDieType.white);
+    return new AttackDie(AttackDieType.white, 1);
   }
 
-  private constructor(private readonly sides: AttackDieSide[]) {}
+  private constructor(
+    private readonly sides: AttackDieSide[],
+    public readonly order: number,
+  ) {}
 
   /**
    * With the provided {rng}, changes the result of the die.
@@ -148,41 +151,48 @@ export interface DefenseStats {
   armor?: number | true;
 
   /**
-   * Set if immune to pierce.
+   * Set if immune to pierce or impervious to pierce.
    */
-  immunePierce?: true;
+  pierce?: 'immune' | 'impervious';
 }
 
 export class AttackBranch {
   constructor(
     private readonly rng: Prando,
-    private readonly rolled: AttackDieSide[],
+    private readonly result: Array<{ dice: AttackDie; roll: AttackDieSide }>,
     private readonly modifiers: AttackDiceModifiers,
+    private readonly tokens: AttackerTokens,
   ) {}
 
   private aggregateDice(): { hits: number; crits: number } {
     let hits = 0;
     let crits = 0;
+    let critical = this.modifiers.critical;
+    let surgeTokens = this.tokens.surge;
 
-    for (const roll of this.rolled) {
+    for (const result of this.result) {
+      let { roll } = result;
+
+      if (roll === AttackDieSide.surge) {
+        if (critical) {
+          roll = AttackDieSide.crit;
+          critical--;
+        } else if (this.modifiers.surge !== 'blank' && surgeTokens) {
+          roll = AttackDieSide.hit;
+          surgeTokens--;
+        } else {
+          roll = this.modifiers.surge;
+        }
+      }
+
+      // TODO: Implement aim tokens.
+
       switch (roll) {
         case AttackDieSide.crit:
           crits++;
           break;
         case AttackDieSide.hit:
           hits++;
-          break;
-        case AttackDieSide.surge:
-          switch (this.modifiers.surge) {
-            case 'crit':
-              crits++;
-              break;
-            case 'hit':
-              hits++;
-              break;
-            default:
-              break;
-          }
           break;
         case AttackDieSide.blank:
           break;
@@ -218,7 +228,12 @@ export class AttackBranch {
 
     // Final number of dice that will need to be rolled for wounds.
     // TODO: Consider returning multiple branches per attack.
-    return new DefenseBranch(this.rng, hits + crits, defender);
+    return new DefenseBranch(
+      this.rng,
+      hits + crits,
+      defender,
+      this.modifiers.pierce,
+    );
   }
 
   get rawTotalHits(): number {
@@ -232,13 +247,18 @@ export class DefenseBranch {
     private readonly rng: Prando,
     public readonly hits: number,
     private readonly stats: DefenseStats,
+    private readonly pierce: number,
   ) {}
 
   /**
    * Given the configuration, generates appropriate defense dice.
    */
   private generateDefenseDice(): DefenseDie[] {
-    return Array(this.hits).fill(this.stats.dice);
+    let hits = this.hits;
+    if (this.stats.pierce === 'impervious') {
+      hits += this.pierce;
+    }
+    return Array(hits).fill(this.stats.dice);
   }
 
   /**
@@ -262,7 +282,10 @@ export class DefenseBranch {
       }
     }
 
-    // TODO: Apply pierce.
+    if (this.pierce && this.stats.pierce !== 'immune') {
+      blocks = Math.max(0, blocks - this.pierce);
+    }
+
     // Future-proof against things like danger sense, a minimum of 0 wounds.
     return Math.max(0, this.hits - blocks);
   }
@@ -283,7 +306,7 @@ export class Simulation {
    */
   private generateAttackDice(): AttackDie[] {
     const results: AttackDie[] = [];
-    const dicePool = this.config.attackPool;
+    const dicePool = this.config.pool;
     for (let i = 0; i < dicePool.red; i++) {
       results.push(AttackDie.red());
     }
@@ -296,17 +319,29 @@ export class Simulation {
     return results;
   }
 
+  private staticSortDice(a: AttackDie, b: AttackDie) {}
+
   /**
    * Returns possible results of the simulation.
    */
   simulate(): AttackBranch[] {
     const branches: AttackBranch[] = Array(this.config.iterations);
     for (let i = 0; i < branches.length; i++) {
-      const results = this.generateAttackDice().map((d) => d.roll(this.rng));
+      // Roll dice.
+      const results = this.generateAttackDice()
+        .map((d) => {
+          return {
+            dice: d,
+            roll: d.roll(this.rng),
+          };
+        })
+        .sort((a, b) => a.dice.order - b.dice.order);
+
       branches[i] = new AttackBranch(
         this.rng,
         results,
-        this.config.attackModifiers,
+        this.config.modifiers,
+        this.config.tokens,
       );
     }
     return branches;

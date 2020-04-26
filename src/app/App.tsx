@@ -1,7 +1,12 @@
 import React from 'react';
 import GitInfo from 'react-git-info/macro';
 import { Layout, Card, Form, Button, Row, Col } from 'antd';
-import { SettingOutlined, StarOutlined, EditOutlined } from '@ant-design/icons';
+import {
+  SettingOutlined,
+  StarOutlined,
+  EditOutlined,
+  AppstoreOutlined,
+} from '@ant-design/icons';
 
 import './App.scss';
 
@@ -12,19 +17,30 @@ import Modifiers from '../ui/Modifiers';
 import IterationSlider from '../ui/IterationSlider';
 import Prando from 'prando';
 import SeedInput from '../ui/SeedInput';
+import { AttackDieSide } from './simulation';
+import Tokens from '../ui/Tokens';
 
 const { Sider } = Layout;
 
 class App extends React.Component<{}, SimConfig> {
   public static readonly defaultState: SimConfig = Object.freeze({
-    attackPool: {
+    pool: {
       red: 1,
       black: 1,
       white: 1,
     },
-    attackModifiers: {
+    modifiers: {
+      critical: 0,
       impact: 0,
-      surge: 'none',
+      marksman: false,
+      pierce: 0,
+      precise: 0,
+      surge: AttackDieSide.blank,
+    },
+    tokens: {
+      surge: 0,
+      aim: 0,
+      dodge: 0,
     },
     iterations: 10000,
     rngSeed: `${new Prando().nextString(10)}`,
@@ -42,7 +58,7 @@ class App extends React.Component<{}, SimConfig> {
   encodeStateIfChanged() {
     const encodedState = encodeConfig(this.state);
     if (encodedState === App.defaultEncodedState) {
-      window.location.hash = '';
+      window.location.hash = 'default';
     } else {
       window.location.hash = encodedState;
     }
@@ -86,7 +102,7 @@ class App extends React.Component<{}, SimConfig> {
                 <Col span={24}>
                   <Button
                     block
-                    disabled={!window.location.hash}
+                    disabled={window.location.hash === '#default'}
                     type="danger"
                     onClick={() => {
                       this.setState(App.defaultState);
@@ -107,10 +123,10 @@ class App extends React.Component<{}, SimConfig> {
             }
           >
             <Pool
-              dice={this.state.attackPool}
+              dice={this.state.pool}
               onChanged={(newDice) => {
                 this.setState({
-                  attackPool: newDice,
+                  pool: newDice,
                 });
               }}
             />
@@ -124,10 +140,27 @@ class App extends React.Component<{}, SimConfig> {
             }
           >
             <Modifiers
-              modifiers={this.state.attackModifiers}
+              modifiers={this.state.modifiers}
               onChanged={(newModifiers) => {
                 this.setState({
-                  attackModifiers: newModifiers,
+                  modifiers: newModifiers,
+                });
+              }}
+            />
+          </Card>
+          <Card
+            title={
+              <span>
+                <AppstoreOutlined />
+                <span> Tokens</span>
+              </span>
+            }
+          >
+            <Tokens
+              tokens={this.state.tokens}
+              onChanged={(newTokens) => {
+                this.setState({
+                  tokens: newTokens,
                 });
               }}
             />
