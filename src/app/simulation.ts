@@ -83,17 +83,9 @@ export const DefenseDieType = {
  * Defines a single attack die.
  */
 export class AttackDie {
-  static red(): AttackDie {
-    return new AttackDie(AttackDieType.red, 3);
-  }
-
-  static black(): AttackDie {
-    return new AttackDie(AttackDieType.black, 2);
-  }
-
-  static white(): AttackDie {
-    return new AttackDie(AttackDieType.white, 1);
-  }
+  static readonly red = new AttackDie(AttackDieType.red, 3);
+  static readonly black = new AttackDie(AttackDieType.black, 3);
+  static readonly white = new AttackDie(AttackDieType.white, 3);
 
   private constructor(
     private readonly sides: AttackDieSide[],
@@ -112,17 +104,9 @@ export class AttackDie {
  * Defines a single defense die.
  */
 export class DefenseDie {
-  static red(): DefenseDie {
-    return new DefenseDie(DefenseDieType.red);
-  }
-
-  static white(): DefenseDie {
-    return new DefenseDie(DefenseDieType.white);
-  }
-
-  static none(): DefenseDie {
-    return new DefenseDie([DefenseDieSide.blank]);
-  }
+  static readonly red = new DefenseDie(DefenseDieType.red);
+  static readonly white = new DefenseDie(DefenseDieType.white);
+  static readonly none = new DefenseDie([DefenseDieSide.blank]);
 
   private constructor(private readonly sides: DefenseDieSide[]) {}
 
@@ -308,13 +292,13 @@ export class Simulation {
     const results: AttackDie[] = [];
     const dicePool = this.config.pool;
     for (let i = 0; i < dicePool.red; i++) {
-      results.push(AttackDie.red());
+      results.push(AttackDie.red);
     }
     for (let i = 0; i < dicePool.black; i++) {
-      results.push(AttackDie.black());
+      results.push(AttackDie.black);
     }
     for (let i = 0; i < dicePool.white; i++) {
-      results.push(AttackDie.white());
+      results.push(AttackDie.white);
     }
     return results;
   }

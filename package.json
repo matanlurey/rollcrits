@@ -9,6 +9,7 @@
     "prando": "^5.1.2",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
+    "react-media": "^1.10.0",
     "react-scripts": "3.4.1",
     "simple-statistics": "^7.0.8",
     "victory": "^34.1.3"
