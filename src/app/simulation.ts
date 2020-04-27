@@ -143,7 +143,7 @@ export class AttackBranch {
         if (critical) {
           roll = 'crit';
           critical--;
-        } else if (this.modifiers.surge !== 'blank' && surgeTokens) {
+        } else if (this.modifiers.surge === 'blank' && surgeTokens) {
           roll = 'hit';
           surgeTokens--;
         } else {
