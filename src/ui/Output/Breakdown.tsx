@@ -36,10 +36,26 @@ interface BreakdownProps {
   };
   data: AttackBranch[];
   defenders: DefenderPresetKeys;
-  showDefenderDetails: boolean;
+  onSelect?: (
+    visualize: Array<{
+      name: string;
+      cover: number;
+      wounds: number[];
+    }>,
+  ) => void;
 }
 
-export default class extends React.Component<BreakdownProps> {
+export default class extends React.Component<
+  BreakdownProps,
+  { selectedRowKeys: string[] }
+> {
+  constructor(props: BreakdownProps) {
+    super(props);
+    this.state = {
+      selectedRowKeys: [],
+    };
+  }
+
   render() {
     // Aggregate results per defending unit.
     const results: Array<{
@@ -51,35 +67,64 @@ export default class extends React.Component<BreakdownProps> {
     }> = [];
 
     const defending = presets[this.props.defenders];
+    const visualizing: Array<{
+      name: string;
+      cover: number;
+      wounds: number[];
+    }> = [];
 
-    for (const defender of defending) {
-      let woundsByCoverAmount: number[][] = [[], [], []];
+    if (this.props.data.length) {
+      for (const defender of defending) {
+        let woundsByCoverAmount: number[][] = [[], [], []];
 
-      // For each amount of cover.
-      for (let cover = 0; cover < woundsByCoverAmount.length; cover++) {
-        // For each attacking dice pool.
-        for (const branch of this.props.data) {
-          // Add the number of expected wounds (v cover + defender).
-          woundsByCoverAmount[cover].push(
-            branch.hits(cover, defender).wounds(),
-          );
+        // For each amount of cover.
+        for (let cover = 0; cover < woundsByCoverAmount.length; cover++) {
+          // For each attacking dice pool.
+          for (const branch of this.props.data) {
+            // Add the number of expected wounds (v cover + defender).
+            woundsByCoverAmount[cover].push(
+              branch.hits(cover, defender).wounds(),
+            );
+          }
+
+          visualizing.push({
+            name: defender.name,
+            cover: cover,
+            wounds: woundsByCoverAmount[cover],
+          });
         }
+
+        const expectedWounds = woundsByCoverAmount.map((w) => stats.mean(w));
+        results.push({
+          key: defender.name,
+          unit: defender,
+          cover0: expectedWounds[0].toFixed(2),
+          cover1: expectedWounds[1].toFixed(2),
+          cover2: expectedWounds[2].toFixed(2),
+        });
       }
-
-      const expectedWounds = woundsByCoverAmount.map((w) =>
-        stats.mean(w).toFixed(2),
-      );
-
-      results.push({
-        key: defender.name,
-        unit: defender,
-        cover0: expectedWounds[0],
-        cover1: expectedWounds[1],
-        cover2: expectedWounds[2],
-      });
     }
 
     // Add the expected hits independent of the defending unit.
+    /*
+
+      TODO: Re-add.
+      
+      rowSelection={{
+          selectedRowKeys: this.state.selectedRowKeys,
+          onChange: (selectedRowKeys: any) => {
+            const { onSelect } = this.props;
+            if (onSelect) {
+              const filtered = visualizing.filter((v) =>
+                _.includes(selectedRowKeys, v.name),
+              );
+              onSelect(filtered);
+            }
+            this.setState({ selectedRowKeys });
+          },
+        }}
+
+    */
     return (
       <Table bordered dataSource={results} pagination={false} size={'small'}>
         <Column
@@ -94,7 +139,7 @@ export default class extends React.Component<BreakdownProps> {
               <Media
                 query="(min-width: 499px)"
                 render={() => (
-                  <Col span={24} hidden={!this.props.showDefenderDetails}>
+                  <Col span={24} hidden={true}>
                     {renderTags(unit)}
                   </Col>
                 )}

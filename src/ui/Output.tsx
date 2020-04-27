@@ -1,52 +1,106 @@
 import React from 'react';
-import { VictoryChart, VictoryBar, VictoryAxis } from 'victory';
+import { VictoryChart, VictoryBar, VictoryAxis, VictoryGroup } from 'victory';
 import Breakdown from './Output/Breakdown';
-import { Simulation } from '../app/simulation';
+import { Simulation, AttackBranch } from '../app/simulation';
 import { Inputs } from '../app/config';
 
-export default (props: { simulate: Inputs }) => {
-  const data = new Simulation(props.simulate).simulate();
-  const grouped: { [key: number]: number } = {};
-  const ticks = new Set<number>();
-  for (const result of data) {
-    const hits = result.rawTotalHits;
-    grouped[hits] = (grouped[hits] || 0) + 1;
-    ticks.add(hits);
+export default class extends React.Component<
+  { simulate: Inputs },
+  {
+    simulated: AttackBranch[];
+    selected: Array<{
+      name: string;
+      cover: number;
+      wounds: number[];
+    }>;
   }
-  return (
-    <>
-      <VictoryChart
-        animate={{ duration: 1000 }}
-        domainPadding={{ x: 25 }}
-        height={200}
-      >
-        <VictoryBar
-          data={Object.entries(grouped).map((value) => {
-            return { x: value[0], y: value[1] };
-          })}
-          labels={({ datum }) =>
-            `${((datum.y / data.length) * 100).toFixed(0)}%`
-          }
-          style={{
-            data: {
-              fill: 'tomato',
-            },
+> {
+  constructor(props: { simulate: Inputs }) {
+    super(props);
+    this.state = {
+      simulated: new Simulation(this.props.simulate).simulate(),
+      selected: [],
+    };
+  }
+
+  private buildGroup(results: number[]): number[] {
+    const grouped: number[] = [];
+    for (const wounds of results) {
+      const before = grouped[wounds] || 0;
+      grouped[wounds] = before + 1;
+    }
+    return grouped;
+  }
+
+  private buildTicks(results: AttackBranch[]): number[] {
+    return this.buildGroup(results.map((v) => v.rawTotalHits));
+  }
+
+  componentDidUpdate(prevProps: { simulate: Inputs }): void {
+    if (prevProps.simulate !== this.props.simulate) {
+      this.setState({
+        simulated: new Simulation(this.props.simulate).simulate(),
+      });
+    }
+  }
+
+  render() {
+    return (
+      <>
+        <VictoryChart
+          animate={{ duration: 2000 }}
+          height={200}
+          domainPadding={{ x: 25 }}
+        >
+          <VictoryGroup colorScale={'qualitative'} offset={20}>
+            {this.state.selected.length === 0 ? (
+              <VictoryBar
+                data={this.buildTicks(this.state.simulated).map(
+                  (value, index) => {
+                    return {
+                      x: `${index}`,
+                      y: value,
+                    };
+                  },
+                )}
+                labels={({ datum }) =>
+                  `${((datum.y / this.state.simulated.length) * 100).toFixed(
+                    0,
+                  )}%`
+                }
+                style={{
+                  data: {
+                    fill: 'tomato',
+                  },
+                }}
+                key="Expected Hits"
+              />
+            ) : (
+              <></>
+            )}
+          </VictoryGroup>
+          <VictoryAxis
+            label={
+              this.state.selected.length
+                ? 'Comparing Wounds'
+                : 'Aggregate Expected Hits'
+            }
+            style={{
+              axisLabel: { padding: 30 },
+            }}
+          />
+        </VictoryChart>
+        <Breakdown
+          data={this.state.simulated}
+          defenders={this.props.simulate.defenders}
+          onSelect={() => {
+            // TODO: Implment.
+          }}
+          mods={{
+            impact: this.props.simulate.attackMods.impact,
           }}
         />
-        <VictoryAxis
-          style={{
-            axisLabel: { padding: 30 },
-          }}
-        />
-      </VictoryChart>
-      <Breakdown
-        data={data}
-        defenders={props.simulate.defenders}
-        mods={{
-          impact: props.simulate.attackMods.impact,
-        }}
-        showDefenderDetails={false}
-      />
-    </>
-  );
-};
+      </>
+    );
+  }
+}
