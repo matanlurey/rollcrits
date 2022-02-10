@@ -39,7 +39,7 @@
     "@types/victory": "^33.1.4",
     "dayjs": "^1.8.25",
     "gh-pages": "^2.2.0",
-    "node-sass": "^4.13.1",
+    "node-sass": "^7.0.0",
     "prettier": "^2.0.4",
     "react-git-info": "^1.0.1",
     "sass": "^1.26.5",
